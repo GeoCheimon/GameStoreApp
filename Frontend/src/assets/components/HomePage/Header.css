@@ -1,0 +1,55 @@
+/* Κρατάμε μόνο τα custom στυλ που δεν καλύπτει το Bootstrap */
+.app-header {
+  background-color: #0b192f;
+  border-bottom: 1px solid #1f3a5f;
+}
+
+/* Custom χρώμα για το λογότυπο και μέγεθος γραμματοσειράς */
+.header-logo a {
+  color: #64ffda;
+  font-size: 1.7rem;
+  letter-spacing: 1px;
+}
+
+/* Custom στυλ για το input που αναιρούν το default του Bootstrap */
+.header-search-input {
+  background-color: #1f3a5f;
+  border: 1px solid #1f3a5f;
+  color: #ccd6f6;
+  max-width: 600px; /* Κρατάμε το μέγιστο πλάτος */
+  margin: 0 auto; /* Το κεντράρουμε μέσα στο container του */
+}
+
+/* Αλλάζουμε το χρώμα του placeholder για να ταιριάζει */
+.header-search-input::placeholder {
+  color: #8892b0;
+}
+
+/* Όταν το input είναι σε focus, αλλάζουμε το χρώμα του border για να ταιριάζει */
+.header-search-input:focus {
+  background-color: #1f3a5f;
+  border-color: #64ffda;
+  box-shadow: 0 0 0 0.25rem rgba(100, 255, 218, 0.25);
+  color: #ccd6f6;
+}
+
+/* Τα custom κουμπιά μας παραμένουν ίδια */
+.nav-button {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid #64ffda;
+  color: #64ffda;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+  font-weight: 500;
+}
+
+.nav-button:hover {
+  background-color: rgba(100, 255, 218, 0.1);
+  color: #64ffda;
+}
+
+/* Το custom χρώμα για το εικονίδιο */
+.nav-icon {
+  color: #64ffda;
+}

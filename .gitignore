@@ -1,0 +1,35 @@
+# Αρχεία και φάκελοι που παράγονται από το λειτουργικό σύστημα
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+
+# Αρχεία και φάκελοι για το Visual Studio Code
+.vscode/
+
+# Frontend (React/Vite)
+/Frontend/node_modules
+/Frontend/dist
+/Frontend/build
+
+# Backend (Spring Boot)
+/Backend/target
+/Backend/.classpath
+/Backend/.project
+/Backend/.settings
+/Backend/bin/
+/Backend/lib/
+
+# IntelliJ
+*.iml
+.idea/
+
+# Ευαίσθητα αρχεία
+*.env
+*.properties

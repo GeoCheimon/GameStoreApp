@@ -1,0 +1,99 @@
+/* --- ΑΛΛΑΓΗ: Το Wrapper γίνεται το "παράθυρο" --- */
+.category-carousel-wrapper {
+  position: relative;
+  /* Κεντράρουμε το carousel μέσα στο container της σελίδας */
+  margin: 0 auto;
+  /* --- ΑΛΛΑΓΗ: Ορίζουμε το πλάτος του "παραθύρου" --- */
+  /* Υπολογισμός: (3 κάρτες * 280px) + (2 κενά * 1.5rem) */
+  /* Το 1.5rem είναι το gap-4 του Bootstrap. Χρησιμοποιούμε calc για ακρίβεια. */
+  width: calc( (280px * 3) + (1.5rem * 2) );
+  /* Σε περίπτωση που η οθόνη είναι μικρότερη, δεν θα ξεχειλίσει */
+  max-width: 100%;
+}
+
+/* --- Το εσωτερικό container που σκρολάρει --- */
+.category-list {
+  overflow-x: auto; /* Επιτρέπει το scroll, ακόμα κι αν είναι κρυφό */
+  scroll-behavior: smooth;
+  /* Κανόνες για να κρύψουμε την μπάρα κύλισης σε όλους τους browsers */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+/* Για Chrome, Safari and Opera */
+.category-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* ... (τα στυλ για .category-card, .category-name κ.λπ. παραμένουν ίδια) ... */
+.category-card {
+  position: relative;
+  min-width: 280px;
+  height: 350px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+  border: 1px solid #1f3a5f;
+}
+
+.category-card:hover {
+  transform: scale(1.03);
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+  border-radius: 10px;
+}
+
+.category-name {
+  position: relative;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+
+/* --- Στυλ για τα βελάκια --- */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: rgba(20, 32, 56, 0.7);
+  border: 1px solid #1f3a5f;
+  color: white;
+  width: 45px;
+  height: 70px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.carousel-arrow:hover {
+  background-color: rgba(31, 58, 95, 0.9);
+}
+
+.left-arrow {
+  left: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.right-arrow {
+  right: 0;
+  border-radius: 8px 0 0 8px;
+}
