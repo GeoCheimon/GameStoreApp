@@ -16,7 +16,7 @@ const Header = () => {
       {/* 'text-decoration-none': Κλάση του Bootstrap που αφαιρεί την υπογράμμιση. */}
       {/* 'fw-bold': Κλάση του Bootstrap που κάνει το κείμενο έντονο (font-weight: bold). */}
       <div className="header-logo">
-        <a href="/" className="text-decoration-none fw-bold">E-Shop</a>
+        <a href="/" className="text-decoration-none fw-bold">LootZone</a>
       </div>
 
       {/* --- Μπάρα Αναζήτησης --- */}
