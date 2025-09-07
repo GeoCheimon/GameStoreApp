@@ -12,7 +12,6 @@ import './CategoryCarousel.css';
 interface Category {
   id: number;
   name: string;
-  imageUrl: string;
 }
 
 // --- Mock Data (Ψεύτικα Δεδομένα) ---
@@ -22,122 +21,113 @@ interface Category {
 // Τώρα, αν προσπαθήσεις να φτιάξεις ένα αντικείμενο χωρίς 'name', ο VS Code θα σου βγάλει κόκκινη γραμμή ΑΜΕΣΩΣ.
 // --- Mock Data (Ψεύτικα Δεδομένα) ---
 const categories: Category[] = [
-  { id: 1, name: 'ACTION', imageUrl: 'https://placehold.co/400x500/3498db/ffffff/png?text=Action' },
-  { id: 2, name: 'ROLES', imageUrl: 'https://placehold.co/400x500/e74c3c/ffffff/png?text=RPG' },
-  { id: 3, name: 'STRATEGY', imageUrl: 'https://placehold.co/400x500/2ecc71/ffffff/png?text=Strategy' },
-  { id: 4, name: 'ADVENTURE', imageUrl: 'https://placehold.co/400x500/f1c40f/ffffff/png?text=Adventure' },
-  { id: 5, name: 'SIMULATION', imageUrl: 'https://placehold.co/400x500/9b59b6/ffffff/png?text=Simulation' },
-  { id: 6, name: 'RACING', imageUrl: 'https://placehold.co/400x500/e67e22/ffffff/png?text=RACING' }
+  { id: 1, name: 'ACTION' },
+  { id: 2, name: 'ROLES' },
+  { id: 3, name: 'STRATEGY' },
+  { id: 4, name: 'ADVENTURE' },
+  { id: 5, name: 'SIMULATION' },
+  { id: 6, name: 'RACING' }
 ];
 
 // --- Το React Component ---
 // --- ΣΧΟΛΙΟ TypeScript: Τύπος Επιστροφής Συνάρτησης ---
 // Ακόμα και εδώ, το TypeScript καταλαβαίνει αυτόματα ότι η συνάρτηση επιστρέφει JSX.Element.
 // Δεν χρειάζεται να το γράψουμε, αλλά θα μπορούσαμε: const CategoryCarousel = (): JSX.Element => { ... }
+// --- React Component ---
+// Δεν δηλώνουμε ρητά τύπο επιστροφής (TS καταλαβαίνει JSX.Element).
 const CategoryCarousel = () => {
-  // --- ΣΧΟΛΙΟ React Hook: useRef ---
-  // Δημιουργούμε ένα "ref" που θα συνδεθεί με το div που περιέχει τις κάρτες.
-  // Αυτό μας επιτρέπει να το ελέγχουμε μέσω JavaScript (π.χ. να του πούμε "κάνε scroll").
+  // Ref για το flex container που σκρολάρει οριζόντια.
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // --- Συνάρτηση Χειρισμού του Scroll ---
-  // Αυτή η συνάρτηση καλείται όταν πατιέται ένα από τα βελάκια.
-  // --- ΑΛΛΑΓΗ: Προσθέσαμε λογική για κυκλική πλοήγηση (loop) ---
+  // --- ΝΕΟ: Mapping για display names (δυναμικό) ---
+  const displayNameMap: { [key: string]: string } = {
+    'ACTION': 'Action',
+    'ROLES': 'RPG', 
+    'STRATEGY': 'Strategy',
+    'ADVENTURE': 'Adventure',
+    'SIMULATION': 'Simulation',
+    'RACING': 'Racing'
+  };
+
+  // Συνάρτηση χειρισμού scroll (με κυκλικό loop).
   const handleScroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      // Παίρνουμε τις διαστάσεις του container:
-      // scrollLeft: Πόσο έχουμε σκρολάρει από την αρχή.
-      // clientWidth: Το ορατό πλάτος του container.
-      // scrollWidth: Το συνολικό πλάτος όλου του περιεχομένου (όλες οι κάρτες μαζί).
-      const { scrollLeft, clientWidth, scrollWidth } = container;
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const { scrollLeft, clientWidth, scrollWidth } = container;
 
-      const firstCard = container.children[0] as HTMLElement;
-      if (firstCard) {
-        const cardWidth = firstCard.offsetWidth;
-        const gap = parseInt(window.getComputedStyle(container).gap) || 0;
-        const scrollAmount = cardWidth + gap;
+    const firstCard = container.children[0] as HTMLElement | null;
+    if (!firstCard) return;
 
-        if (direction === 'right') {
-          // Ελέγχουμε αν είμαστε κοντά στο τέλος.
-          // Το `+1` είναι ένα μικρό buffer για τυχόν δεκαδικές τιμές.
-          if (scrollLeft + clientWidth + 1 >= scrollWidth) {
-            // Αν είμαστε στο τέλος, πήγαινε στην αρχή.
-            container.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            // Αλλιώς, απλά πήγαινε μία θέση δεξιά.
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-          }
-        } else { // direction === 'left'
-          // Ελέγχουμε αν είμαστε στην αρχή.
-          if (scrollLeft === 0) {
-            // Αν είμαστε στην αρχή, πήγαινε στο τέλος.
-            container.scrollTo({ left: scrollWidth, behavior: 'smooth' });
-          } else {
-            // Αλλιώς, απλά πήγαινε μία θέση αριστερά.
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-          }
-        }
+    // Υπολογισμός "βήματος": πλάτος κάρτας + gap (από το CSS).
+    const cardWidth = firstCard.offsetWidth;
+    const gap = parseInt(window.getComputedStyle(container).gap) || 0;
+    const scrollAmount = cardWidth + gap;
+
+    if (direction === 'right') {
+      // Αν είμαστε ουσιαστικά στο τέλος → επέστρεψε αρχή (loop)
+      if (scrollLeft + clientWidth >= scrollWidth - 5) {
+        container.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    } else {
+      // Αν είμαστε στην αρχή → πήγαινε στο τέλος (loop).
+      if (scrollLeft <= 5) {
+        // ΔΙΟΡΘΩΣΗ: Πήγαινε στο τελευταίο scrollable position
+        container.scrollTo({ left: scrollWidth - clientWidth, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
       }
     }
   };
 
-
   return (
-    // --- ΣΧΟΛΙΟ Bootstrap: Χρησιμοποιούμε την κλάση 'container' για να κεντράρουμε το section
-    // και την κλάση 'py-5' για να προσθέσουμε κάθετο padding (py = padding-top & padding-bottom).
-    <section className="container py-5">{/* Το section τυλίγει όλη την 
-    κατηγορία. Τι είναι το section; Είναι ένα HTML στοιχείο που χρησιμοποιείται 
-    για να ομαδοποιήσει περιεχόμενο. */}
-      {/* --- ΣΧΟΛΙΟ Bootstrap: 'text-light' για ανοιχτόχρωμο κείμενο, 'mb-4' για margin-bottom. */}
+    // Bootstrap: container = κεντράρισμα, py-5 = κάθετο spacing.
+    <section className="container py-5">
       <h2 className="text-light mb-4">CATEGORIES</h2>
 
-      {/* --- ΝΕΟ: Wrapper για το Carousel --- */}
-      {/* Αυτό το div είναι απαραίτητο για να τοποθετήσουμε σωστά τα βελάκια. */}
+      {/* Wrapper για να τοποθετήσουμε βελάκια πάνω από το οριζόντιο scroll */}
       <div className="category-carousel-wrapper">
-
-        {/* --- ΝΕΟ: Κουμπί Αριστερά --- */}
-        <button className="carousel-arrow left-arrow" onClick={() => handleScroll('left')}>
-          <BsChevronLeft size={24} />
+        {/* Κουμπί Αριστερά */}
+        <button
+          className="carousel-arrow left-arrow"
+          onClick={() => handleScroll('left')}
+          aria-label="Scroll categories left"
+        >
+            <BsChevronLeft size={24} />
         </button>
 
-        {/* --- ΝΕΑ ΔΟΜΗ: Το "Παράθυρο" (Viewport) --- */}
-        {/* Αυτό το div θα έχει σταθερό πλάτος και θα κρύβει ό,τι ξεχειλίζει. */}
+        {/* Viewport: Κρύβει το overflow (οριζόντιο scroll μέσα). */}
         <div className="carousel-viewport">
-          {/* 
-            --- ΣΧΟΛΙΟ Bootstrap & Custom CSS ---
-            'd-flex': Ενεργοποιεί το flexbox για να μπουν οι κάρτες στη σειρά.
-            'gap-4': Προσθέτει ένα κενό (gap) ανάμεσα στα flex items (τις κάρτες).
-            'category-list': Η δική μας κλάση για τυχόν εξειδικευμένο styling.
-            ΣΗΜΕΙΩΣΗ: Προσθέσαμε το 'ref={scrollContainerRef}' για να συνδέσουμε το div με τη λογική μας.
-          */}
-          <div className="d-flex gap-4 category-list" ref={scrollContainerRef}>        
-            
-            {/* --- ΣΧΟΛΙΟ TypeScript: Type Inference ---
-                Εδώ, το TypeScript είναι έξυπνο. Επειδή ξέρει ότι ο πίνακας 'categories'
-                περιέχει αντικείμενα 'Category', καταλαβαίνει αυτόματα (type inference)
-                ότι η μεταβλητή 'category' μέσα στο map είναι τύπου 'Category'.
-                Έτσι, αν γράψεις category.name (με τυπογραφικό), θα σε διορθώσει αμέσως!
-            */}
-            {/* Οι αγκύλες σημαίνουν ότι μπαίνει κώδικας JavaScript μέσα στο JSX. */}
-            {categories.map((category) => (
-              // --- ΣΧΟΛΙΟ Custom CSS & Inline Style ---
-              // Εδώ χρησιμοποιούμε τη δική μας κλάση 'category-card' από το CategoryCarousel.css
-              // γιατί η εμφάνισή της (background, overlay, hover) είναι πολύ εξειδικευμένη.
-              // Το backgroundImage το περνάμε ως inline style γιατί είναι δυναμικό για κάθε κάρτα.
-              <div
-                key={category.id}
-                className="category-card"
-                style={{ backgroundImage: `url(${category.imageUrl})` }}
-              >
-                <div className="category-name">{category.name}</div>
-              </div>
-            ))}
+          {/* Flex container με gap. Το ref συνδέεται για έλεγχο scroll. */}
+          <div className="d-flex gap-3 category-list" ref={scrollContainerRef}>
+            {categories.map(category => {
+              const colorClass = `category-${category.name.toLowerCase()}`;
+              // Δυναμικό display name με fallback στο αρχικό όνομα
+              const displayName = displayNameMap[category.name] || category.name;
+              
+              return (
+                <div
+                  key={category.id}
+                  className={`card category-card flex-shrink-0 ${colorClass}`}
+                  data-category={category.name}
+                >
+                  <div className="category-logo">
+                    {displayName}
+                  </div>
+                  {/* Αφαιρέθηκε το category-title */}
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* --- ΝΕΟ: Κουμπί Δεξιά --- */}
-        <button className="carousel-arrow right-arrow" onClick={() => handleScroll('right')}>
+        {/* Κουμπί Δεξιά */}
+        <button
+          className="carousel-arrow right-arrow"
+          onClick={() => handleScroll('right')}
+          aria-label="Scroll categories right"
+        >
           <BsChevronRight size={24} />
         </button>
       </div>

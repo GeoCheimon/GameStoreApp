@@ -1,99 +1,142 @@
-/* --- ΑΛΛΑΓΗ: Το Wrapper γίνεται το "παράθυρο" --- */
+/* 1. Wrapper - Εξωτερικό container */
 .category-carousel-wrapper {
   position: relative;
-  /* Κεντράρουμε το carousel μέσα στο container της σελίδας */
   margin: 0 auto;
-  /* --- ΑΛΛΑΓΗ: Ορίζουμε το πλάτος του "παραθύρου" --- */
-  /* Υπολογισμός: (3 κάρτες * 280px) + (2 κενά * 1.5rem) */
-  /* Το 1.5rem είναι το gap-4 του Bootstrap. Χρησιμοποιούμε calc για ακρίβεια. */
-  width: calc( (280px * 3) + (1.5rem * 2) );
-  /* Σε περίπτωση που η οθόνη είναι μικρότερη, δεν θα ξεχειλίσει */
   max-width: 100%;
-}
-
-/* --- Το εσωτερικό container που σκρολάρει --- */
-.category-list {
-  overflow-x: auto; /* Επιτρέπει το scroll, ακόμα κι αν είναι κρυφό */
-  scroll-behavior: smooth;
-  /* Κανόνες για να κρύψουμε την μπάρα κύλισης σε όλους τους browsers */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-/* Για Chrome, Safari and Opera */
-.category-list::-webkit-scrollbar {
-  display: none;
-}
-
-/* ... (τα στυλ για .category-card, .category-name κ.λπ. παραμένουν ίδια) ... */
-.category-card {
-  position: relative;
-  min-width: 280px;
-  height: 350px;
-  border-radius: 10px;
-  background-size: cover;
-  background-position: center;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding: 20px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
+}
+/* 2. Viewport - Το "παράθυρο" που δείχνει 3 κάρτες */
+.carousel-viewport {
   overflow: hidden;
-  border: 1px solid #1f3a5f;
-}
-
-.category-card:hover {
-  transform: scale(1.03);
-}
-
-.category-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
-  border-radius: 10px;
-}
-
-.category-name {
+  width: calc( (320px * 3) + (1.5rem * 2) );
   position: relative;
-  color: white;
-  font-size: 1.4rem;
-  font-weight: bold;
-  text-align: center;
+}
+
+/* 3. Category List - Το scrollable container */
+.category-list {
+  scroll-behavior: smooth;
+  overflow-x: auto; /* Ενεργοποίηση οριζόντιου scroll */
+  overflow-y: hidden;
+  /* Κρύψιμο scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  display: flex;
+  /* gap: 1.5rem; Δεν χρειάζεται γιατι καλυπτεται απο το bootstrap */
+}
+.category-list::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 
-/* --- Στυλ για τα βελάκια --- */
+/* Κάρτες κατηγοριών */
+.category-card {
+  width: 320px;
+  height: 460px !important;
+  border: none !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  color: white !important;
+  box-shadow: 0 8px 24px -8px rgba(0,0,0,0.5) !important;
+  transition: transform 0.3s, box-shadow 0.3s !important;
+  
+  /* Κεντράρισμα του περιεχομένου */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+/* Κείμενο στο κέντρο της κάρτας */
+.category-logo {
+  font-size: 4rem;
+  font-weight: 300;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  color: rgba(255,255,255,0.9);
+}
+
+/* Hover effect */
+.category-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 32px -10px rgba(0,0,0,0.7) !important;
+}
+
+/* Χρώματα ανά κατηγορία */
+.category-action {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+}
+.category-roles {
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+}
+.category-strategy {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+.category-adventure {
+  background: linear-gradient(135deg, #f39c12, #f1c40f);
+}
+.category-simulation {
+  background: linear-gradient(135deg, #8e44ad, #9b59b6);
+}
+.category-racing {
+  background: linear-gradient(135deg, #d35400, #e67e22);
+}
+
+/* Βελάκια πλοήγησης */
 .carousel-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background-color: rgba(20, 32, 56, 0.7);
-  border: 1px solid #1f3a5f;
-  color: white;
-  width: 45px;
-  height: 70px;
-  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
 .carousel-arrow:hover {
-  background-color: rgba(31, 58, 95, 0.9);
+  background: rgba(0,0,0,0.8);
+  transform: translateY(-50%) scale(1.1);
 }
 
-.left-arrow {
-  left: 0;
-  border-radius: 0 8px 8px 0;
+.left-arrow { left: -60px; }
+.right-arrow { right: -60px; }
+
+/* Responsive προσαρμογή */
+@media (max-width: 992px) {
+  .category-carousel-wrapper { 
+    width: 100%; 
+  }
+  .category-card { 
+    width: 250px; 
+    height: 350px; 
+  }
+  .category-logo {
+    font-size: 3rem;
+  }
+  .left-arrow { left: -30px; }
+  .right-arrow { right: -30px; }
 }
 
-.right-arrow {
-  right: 0;
-  border-radius: 8px 0 0 8px;
+@media (max-width: 576px) {
+  .category-card {
+    width: 180px;
+    height: 240px;
+  }
+  .category-logo {
+    font-size: 2rem;
+  }
+  .left-arrow { left: 4px; }
+  .right-arrow { right: 4px; }
 }
