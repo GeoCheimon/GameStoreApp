@@ -1,6 +1,7 @@
 // --- Αρχείο γραμμένο σε TypeScript (.tsx) ---
 // --- ΣΧΟΛΙΟ React: Εισάγουμε τα hooks και τα εικονίδια που θα χρειαστούμε ---
 import { useRef } from 'react'; // useRef για να "πιάσουμε" το div που σκρολάρει.
+import { useNavigate } from 'react-router-dom'; // Hook για πλοήγηση μεταξύ σελίδων
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs'; // Εικονίδια για τα βελάκια.
 import './CategoryCarousel.css';
 
@@ -37,7 +38,14 @@ const categories: Category[] = [
 // Δεν δηλώνουμε ρητά τύπο επιστροφής (TS καταλαβαίνει JSX.Element).
 const CategoryCarousel = () => {
   // Ref για το flex container που σκρολάρει οριζόντια.
+  // Αυτό μας επιτρέπει να "πιάσουμε" ένα συγκεκριμένο HTML element (το div που σκρολάρει)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+
+  // --- ΣΧΟΛΙΟ React Router: useNavigate hook ---
+  // Αυτό είναι ο "σωστός" τρόπος για πλοήγηση σε SPA με React Router
+  // Αντί για window.location.href, χρησιμοποιούμε το navigate()
+  const navigate = useNavigate();
 
   // --- ΝΕΟ: Mapping για display names (δυναμικό) ---
   const displayNameMap: { [key: string]: string } = {
@@ -49,6 +57,16 @@ const CategoryCarousel = () => {
     'RACING': 'Racing'
   };
 
+  // --- Click Event Handler Function ---
+  // Αυτή η συνάρτηση θα εκτελείται όταν κάποιος κάνει click σε μια κατηγορία
+  // --- ΣΧΟΛΙΟ React Router: Event Handler για navigation ---
+  const handleCategoryClick = (categoryName: string) => {
+    // Χρησιμοποιούμε το navigate() αντί για window.location.href
+    // Αυτό κάνει SPA navigation χωρίς page reload
+    // Το ?category= είναι URL parameter που θα διαβάσουμε στη νέα σελίδα
+    navigate(`/games?category=${categoryName}`);
+  };
+  
   // Συνάρτηση χειρισμού scroll (με κυκλικό loop).
   const handleScroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
@@ -111,11 +129,12 @@ const CategoryCarousel = () => {
                   key={category.id}
                   className={`card category-card flex-shrink-0 ${colorClass}`}
                   data-category={category.name}
+                  onClick={() => handleCategoryClick(category.name)}
+                  style={{ cursor: 'pointer' }} // Δείχνει ότι είναι clickable
                 >
                   <div className="category-logo">
                     {displayName}
                   </div>
-                  {/* Αφαιρέθηκε το category-title */}
                 </div>
               );
             })}
