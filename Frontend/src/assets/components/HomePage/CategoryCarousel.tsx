@@ -30,6 +30,40 @@ const categories: Category[] = [
   { id: 6, name: 'RACING' }
 ];
 
+// Δημιουργούμε ξεχωριστό component για κάθε category button
+interface CategoryButtonProps {
+  category: Category;
+  displayName: string;
+  colorClass: string;
+}
+
+const CategoryButton = ({ category, displayName, colorClass }: CategoryButtonProps) => {
+  // --- ΣΧΟΛΙΟ React Router: useNavigate hook για SPA navigation ---
+  const navigate = useNavigate();
+
+  // --- ΣΧΟΛΙΟ: Event Handler για το button click ---
+  // Αυτή η συνάρτηση καλείται όταν ο χρήστης κάνει click στο button
+  const handleCategoryClick = () => {
+    // --- ΣΧΟΛΙΟ SPA: Navigate χωρίς page reload ---
+    // Χρησιμοποιούμε το navigate() για SPA navigation
+    // Αλλάζει το URL και φορτώνει το GamesPage component
+    navigate(`/games?category=${category.name}`);
+  };
+
+  return (
+    <button
+      className={`card category-card flex-shrink-0 ${colorClass} category-button`}
+      data-category={category.name}
+      onClick={handleCategoryClick}
+      aria-label={`Navigate to ${displayName} games`} // Accessibility
+    >
+      <div className="category-logo">
+        {displayName}
+      </div>
+    </button>
+  );
+};
+
 // --- Το React Component ---
 // --- ΣΧΟΛΙΟ TypeScript: Τύπος Επιστροφής Συνάρτησης ---
 // Ακόμα και εδώ, το TypeScript καταλαβαίνει αυτόματα ότι η συνάρτηση επιστρέφει JSX.Element.
@@ -42,12 +76,8 @@ const CategoryCarousel = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 
-  // --- ΣΧΟΛΙΟ React Router: useNavigate hook ---
-  // Αυτό είναι ο "σωστός" τρόπος για πλοήγηση σε SPA με React Router
-  // Αντί για window.location.href, χρησιμοποιούμε το navigate()
-  const navigate = useNavigate();
 
-  // --- ΝΕΟ: Mapping για display names (δυναμικό) ---
+  // --- ΣΧΟΛΙΟ: Mapping για display names ---
   const displayNameMap: { [key: string]: string } = {
     'ACTION': 'Action',
     'ROLES': 'RPG', 
@@ -55,16 +85,6 @@ const CategoryCarousel = () => {
     'ADVENTURE': 'Adventure',
     'SIMULATION': 'Simulation',
     'RACING': 'Racing'
-  };
-
-  // --- Click Event Handler Function ---
-  // Αυτή η συνάρτηση θα εκτελείται όταν κάποιος κάνει click σε μια κατηγορία
-  // --- ΣΧΟΛΙΟ React Router: Event Handler για navigation ---
-  const handleCategoryClick = (categoryName: string) => {
-    // Χρησιμοποιούμε το navigate() αντί για window.location.href
-    // Αυτό κάνει SPA navigation χωρίς page reload
-    // Το ?category= είναι URL parameter που θα διαβάσουμε στη νέα σελίδα
-    navigate(`/games?category=${categoryName}`);
   };
   
   // Συνάρτηση χειρισμού scroll (με κυκλικό loop).
@@ -125,17 +145,12 @@ const CategoryCarousel = () => {
               const displayName = displayNameMap[category.name] || category.name;
               
               return (
-                <div
+                <CategoryButton
                   key={category.id}
-                  className={`card category-card flex-shrink-0 ${colorClass}`}
-                  data-category={category.name}
-                  onClick={() => handleCategoryClick(category.name)}
-                  style={{ cursor: 'pointer' }} // Δείχνει ότι είναι clickable
-                >
-                  <div className="category-logo">
-                    {displayName}
-                  </div>
-                </div>
+                  category={category}
+                  displayName={displayName}
+                  colorClass={colorClass}
+                />
               );
             })}
           </div>
