@@ -52,7 +52,7 @@ const CategoryButton = ({ category, displayName, colorClass }: CategoryButtonPro
 
   return (
     <button
-      className={`card category-card flex-shrink-0 ${colorClass} category-button`}
+      className={`card category-card flex-shrink-0 ${colorClass}`}
       data-category={category.name}
       onClick={handleCategoryClick}
       aria-label={`Navigate to ${displayName} games`} // Accessibility
