@@ -21,7 +21,7 @@ interface Category {
 // που περιέχει αντικείμενα τύπου 'Category' ".
 // Τώρα, αν προσπαθήσεις να φτιάξεις ένα αντικείμενο χωρίς 'name', ο VS Code θα σου βγάλει κόκκινη γραμμή ΑΜΕΣΩΣ.
 // --- Mock Data (Ψεύτικα Δεδομένα) ---
-const categories: Category[] = [
+export const categories: Category[] = [
   { id: 1, name: 'ACTION' },
   { id: 2, name: 'ROLES' },
   { id: 3, name: 'STRATEGY' },
@@ -29,6 +29,16 @@ const categories: Category[] = [
   { id: 5, name: 'SIMULATION' },
   { id: 6, name: 'RACING' }
 ];
+
+  // --- ΣΧΟΛΙΟ: Mapping για display names ---
+  export const displayNameMap: { [key: string]: string } = {
+    'ACTION': 'Action',
+    'ROLES': 'RPG', 
+    'STRATEGY': 'Strategy',
+    'ADVENTURE': 'Adventure',
+    'SIMULATION': 'Simulation',
+    'RACING': 'Racing'
+  };
 
 // Δημιουργούμε ξεχωριστό component για κάθε category button
 interface CategoryButtonProps {
@@ -77,15 +87,7 @@ const CategoryCarousel = () => {
 
 
 
-  // --- ΣΧΟΛΙΟ: Mapping για display names ---
-  const displayNameMap: { [key: string]: string } = {
-    'ACTION': 'Action',
-    'ROLES': 'RPG', 
-    'STRATEGY': 'Strategy',
-    'ADVENTURE': 'Adventure',
-    'SIMULATION': 'Simulation',
-    'RACING': 'Racing'
-  };
+
   
   // Συνάρτηση χειρισμού scroll (με κυκλικό loop).
   const handleScroll = (direction: 'left' | 'right') => {

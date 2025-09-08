@@ -15,7 +15,7 @@
 }
 
 /* 3. Category List - Το scrollable container */
-.category-list {
+.carousel-viewport .category-list {
   scroll-behavior: smooth;
   overflow-x: auto; /* Ενεργοποίηση οριζόντιου scroll */
   overflow-y: hidden;
@@ -25,7 +25,7 @@
   display: flex;
   /* gap: 1.5rem; Δεν χρειάζεται γιατι καλυπτεται απο το bootstrap */
 }
-.category-list::-webkit-scrollbar {
+.carousel-viewport .category-list::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
 
