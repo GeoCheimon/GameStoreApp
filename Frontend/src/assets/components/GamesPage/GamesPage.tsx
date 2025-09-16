@@ -1,15 +1,62 @@
+import { useState } from 'react';
+import { useEffect } from 'react';
 import Header from '../HomePage/Header'; // Σωστό σχετικό μονοπάτι από src/pages προς src/assets/components/HomePage
 import GamesFilter from './GamesFilter';
 import './GamesPage.css';
 import { useSearchParams } from 'react-router-dom'; // CHANGE: Import useSearchParams
+import placeholderImage from '../../images/placeholder.svg';
+
+// ADD: Ορίζουμε τον τύπο για τα δεδομένα του παιχνιδιού
+interface Game {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  imageUrl: string;
+}
 
 const GamesPage = () => {
-  const fakeGames = Array.from({ length: 12 });
+
+  // REMOVE: const fakeGames = Array.from({ length: 12 });
+  // ADD: State για τα παιχνίδια, το loading και τα errors
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchParams, setSearchParams] = useSearchParams(); // CHANGE: Get search params
-  // FIX: Ορίζουμε τις μεταβλητές που έλειπαν.
   // 1. Παίρνουμε τα επιλεγμένα genres από το URL.
   const selectedGenres = searchParams.get('category')?.split(',').filter(Boolean) || [];
 
+  // ADD: useEffect για να φέρνει δεδομένα όταν αλλάζει η κατηγορία
+  useEffect(() => {
+    const category = searchParams.get('category');
+    // Δημιουργούμε το URL του API. Αν υπάρχει κατηγορία, την προσθέτουμε ως query parameter.
+    const apiUrl = `http://localhost:8080/api/games${category ? `?category=${category}` : ''}`;
+
+    /*για να έχεις πιο λεπτομερή πληροφορία στη σελίδα GamesPage 
+    για το ποια κατηγορία έχει επιλεχθεί */
+    setLoading(true); // Ξεκινάμε το loading
+
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setGames(data); // Αποθηκεύουμε τα δεδομένα στο state
+        setError(null);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setError('Failed to load games.');
+      })
+      .finally(() => {
+        setLoading(false); // Σταματάμε το loading
+      });
+  }, [searchParams]); // Το useEffect τρέχει κάθε φορά που αλλάζουν τα searchParams
+  
   // 2. Ορίζουμε τη συνάρτηση που αφαιρεί ένα genre.
   const removeGenre = (genreToRemove: string) => {
     const updatedGenres = selectedGenres.filter(genre => genre !== genreToRemove);
@@ -92,44 +139,43 @@ const GamesPage = () => {
                 Sort: Default
               </button>
             </div>
+            
+            {/* ADD: Έλεγχος για loading και error states */}
+            {loading && <p className="text-light">Loading games...</p>}
+            {error && <p className="text-danger">{error}</p>}
 
             {/* row-cols-2: 2 στήλες ανά σειρά από default.
                 row-cols-sm-2: 2 στήλες από small breakpoint και πάνω.
                 row-cols-md-3: 3 στήλες από medium breakpoint και πάνω.
                 row-cols-lg-4: 4 στήλες από large breakpoint και πάνω.
                 g-4: Κενό (gutter) μεγέθους 4 μεταξύ των στηλών. */}
+            
+            {/* CHANGE: Κάνουμε map πάνω στα πραγματικά δεδομένα από το state */}
+            {!loading && !error && (
             <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-              {fakeGames.map((_, i) => (
+              {games.map((game) => (
                 // col: Μία στήλη μέσα στο grid.
-                <div key={i} className="col">
+                <div key={game.id} className="col">
                   {/* card: Βασικό στυλ κάρτας.
                       h-100: Ύψος 100% για να γεμίζει τον γονέα (το .col).
                       border-0: Αφαιρεί το περίγραμμα.
                       text-light: Ανοιχτόχρωμο κείμενο για όλη την κάρτα.
                       bg-dark: Σκούρο φόντο. */}
                   <div className="game-card card h-100 border-0 text-light bg-dark">
-                    {/* ratio, ratio-16x9: Δημιουργεί ένα πλαίσιο με αναλογία 16:9.
-                        rounded: Στρογγυλεμένες γωνίες.
-                        mb-2: Κάτω περιθώριο (margin-bottom) μεγέθους 2. */}
-                    <div className="thumb-skeleton ratio ratio-16x9 rounded mb-2" />
-                    {/* card-body: Το κυρίως περιεχόμενο της κάρτας, με padding.
-                        py-2, px-2: Κάθετο και οριζόντιο padding μεγέθους 2.
-                        d-flex, flex-column: Flexbox με κάθετη διάταξη. */}
-                    <div className="card-body py-2 px-2 d-flex flex-column">
-                      {/* fw-semibold: Ημι-έντονη γραμματοσειρά (font-weight).
-                          small: Μικρότερο μέγεθος γραμματοσειράς.
-                          text-light: Ανοιχτόχρωμο κείμενο.
-                          mb-1: Κάτω περιθώριο μεγέθους 1. */}
-                      <div className="game-name fw-semibold small text-light mb-1">Game {i + 1}</div>
-                      {/* text-secondary: Γκρι χρώμα κειμένου.
-                          small: Μικρότερο μέγεθος γραμματοσειράς. */}
-                      <div className="game-meta text-secondary small">Price</div>
-                    </div>
+                     {/* CHANGE: Εμφανίζουμε την πραγματική εικόνα */}
+                      <img src={game.imageUrl || placeholderImage} className="card-img-top" alt={game.name} style={{aspectRatio: '16/9', objectFit: 'cover'}} />
+                      <div className="card-body py-2 px-2 d-flex flex-column">
+                        {/* CHANGE: Εμφανίζουμε το πραγματικό όνομα */}
+                        <div className="game-name fw-semibold small text-light mb-1">{game.name}</div>
+                        {/* CHANGE: Εμφανίζουμε την πραγματική τιμή */}
+                        <div className="game-meta text-secondary small">€{game.price.toFixed(2)}</div>
+                      </div>
                   </div>
                 </div>
               ))}
             </div>
-          </main>
+            )}
+          </main> 
         </div>
       </div>
     </>
