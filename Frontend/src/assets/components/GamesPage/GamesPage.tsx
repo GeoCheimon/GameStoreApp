@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from '../HomePage/Header'; // Σωστό σχετικό μονοπάτι από src/pages προς src/assets/components/HomePage
 import GamesFilter from './GamesFilter';
 import './GamesPage.css';
+import SortBy from './SortBy';
 import { useSearchParams } from 'react-router-dom'; // CHANGE: Import useSearchParams
 import placeholderImage from '../../images/placeholder.svg';
 
@@ -23,7 +23,7 @@ interface Game {
 // --- React Component ---
 // Δεν δηλώνουμε ρητά τύπο επιστροφής (TS καταλαβαίνει JSX.Element).
 const GamesPage = () => {
-
+  const [sortOption, setSortOption] = useState<"title-asc" | "title-desc" | "price-asc" | "price-desc" | "discount">("title-asc");
   // ADD: State για τα παιχνίδια, το loading και τα errors
   // --- ΣΧΟΛΙΟ React: useState Hooks ---
   // Αυτά τα hooks δημιουργούν state για το component.
@@ -82,6 +82,49 @@ const GamesPage = () => {
       });
   }, [searchParams]); // Το useEffect τρέχει κάθε φορά που αλλάζουν τα searchParams
   
+  // NEW: Helper function to calculate the discount percentage for a game.
+  // This is needed for the 'discount' sort option.
+  const calculateDiscount = (game: Game): number => {
+    // If there's no original price or the price is not lower, there's no discount.
+    if (!game.originalPrice || game.price >= game.originalPrice) {
+      return 0;
+    }
+    // Calculate and return the discount percentage.
+    return ((game.originalPrice - game.price) / game.originalPrice) * 100;
+  };
+
+  // I use useMemo hook to efficiently sort the games.
+  // The sorting logic runs only when the 'games' array or the 'sortOption' changes.
+  const sortedGames = useMemo(() => {
+    // Create a new array to avoid directly mutating the state.
+    const gamesToSort = [...games];
+
+    switch (sortOption) {
+      case 'price-asc':
+        // Sorts by price, from the lowest to the highest.
+        return gamesToSort.sort((a, b) => a.price - b.price);
+      
+      case 'price-desc':
+        // Sorts by price, from the highest to the lowest.
+        return gamesToSort.sort((a, b) => b.price - a.price);
+      
+      case 'title-asc':
+        // Sorts by name alphabetically (A-Z), using localeCompare for proper string comparison.
+        return gamesToSort.sort((a, b) => a.name.localeCompare(b.name));
+      
+      case 'title-desc':
+        // Sorts by name in reverse alphabetical order (Z-A).
+        return gamesToSort.sort((a, b) => b.name.localeCompare(a.name));
+      
+      case 'discount':
+        // Sorts by the calculated discount percentage, from the highest to the lowest.
+        return gamesToSort.sort((a, b) => calculateDiscount(b) - calculateDiscount(a));
+      
+      default:
+        // If no sort option matches, return the original (unsorted) array.
+        return gamesToSort;
+    }
+  }, [games, sortOption]); // Dependencies: This code runs only when these values change.
   // 2. Ορίζουμε τη συνάρτηση που αφαιρεί ένα genre.
   // ( new changes) Ενημέρωση της removeGenre για να 
   // χρησιμοποιεί τη functional update μορφή του setSearchParams
@@ -125,10 +168,10 @@ const GamesPage = () => {
                 flex-wrap: Επιτρέπει στα στοιχεία να "σπάνε" σε νέα γραμμή αν δεν χωράνε.
                 gap-3: Ορίζει το κενό μεταξύ των flex items σε μέγεθος 3.
                 mb-4: Προσθέτει κάτω εξωτερικό περιθώριο (margin-bottom) μεγέθους 4. */}
-            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-              {/* Αριστερή πλευρά: Εμφανίζει τα κουμπιά των genres */}
-              {/* d-flex, align-items-center, flex-wrap, gap-2: Παρόμοια με παραπάνω, για τα κουμπιά των φίλτρων. */}
-              <div className="d-flex align-items-center flex-wrap gap-2">
+            {/* --- CHANGE: Updated the structure of the header to fix the wrapping issue --- */}
+            <div className="games-main-header">
+              {/* This new container will hold all the selected filter chips */}
+              <div className="filter-chips-container">
                 {selectedGenres.map((genre, index) => (
                   <button
                     key={index}
@@ -160,14 +203,15 @@ const GamesPage = () => {
                 ))}
               </div>
 
-              {/* Δεξιά πλευρά: Κουμπί ταξινόμησης */}
-              {/* btn, btn-sm: Βασικό και μικρό στυλ κουμπιού.
+              {/* Δεξιά πλευρά: Κουμπί ταξινόμησης
+               btn, btn-sm: Βασικό και μικρό στυλ κουμπιού.
                   btn-outline-secondary: Κουμπί με περίγραμμα στο χρώμα secondary.
                   px-3: Οριζόντιο padding (αριστερά-δεξιά) μεγέθους 3.
-                  ms-auto: Σπρώχνει το κουμπί τέρμα δεξιά (margin-start: auto). */}
+                  ms-auto: Σπρώχνει το κουμπί τέρμα δεξιά (margin-start: auto). 
               <button className="btn btn-outline-secondary btn-sm px-3 ms-auto">
                 Sort: Default
-              </button>
+              </button>*/}
+              <SortBy selected={sortOption} onSortChange={setSortOption} />
             </div>
             
             {/* ADD: Έλεγχος για loading και error states */}
@@ -183,23 +227,41 @@ const GamesPage = () => {
             {/* Κάνουμε map πάνω στα πραγματικά δεδομένα από το state */}
             {!loading && !error && (
             <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-              {games.map((game) => (
-                // col: Μία στήλη μέσα στο grid.
+              {/* CHANGE: We now map over 'sortedGames' instead of the original 'games' array. */}
+              {sortedGames.map((game) => (
                 <div key={game.id} className="col">
-                  {/* card: Βασικό στυλ κάρτας.
-                      h-100: Ύψος 100% για να γεμίζει τον γονέα (το .col).
-                      border-0: Αφαιρεί το περίγραμμα.
-                      text-light: Ανοιχτόχρωμο κείμενο για όλη την κάρτα.
-                      bg-dark: Σκούρο φόντο. */}
                   <div className="game-card card h-100 border-0 text-light bg-dark">
-                     {/* Εμφανίζουμε την πραγματική εικόνα */}
-                      <img src={game.imageUrl || placeholderImage} className="card-img-top" alt={game.name} style={{aspectRatio: '16/9', objectFit: 'cover'}} />
-                      <div className="card-body py-2 px-2 d-flex flex-column">
-                        {/* Εμφανίζουμε το πραγματικό όνομα */}
-                        <div className="game-name fw-semibold small text-light mb-1">{game.name}</div>
-                        {/* Εμφανίζουμε την πραγματική τιμή */}
-                        <div className="game-meta text-secondary small">€{game.price.toFixed(2)}</div>
-                      </div>
+                    <img src={game.imageUrl || placeholderImage} className="card-img-top" alt={game.name} style={{aspectRatio: '16/9', objectFit: 'cover'}} />
+                    <div className="card-body py-2 px-2 d-flex flex-column">
+                      <div className="game-name fw-semibold small text-light mb-1" style={{ fontSize: '1rem' }}>{game.name}</div>
+                      
+                      {/* === START: NEW UPDATED PRICE DISPLAY LOGIC === */}
+                        <div className={`game-meta mt-auto d-flex align-items-center ${game.originalPrice && game.originalPrice > game.price ? 'justify-content-between' : 'justify-content-end'}`}>
+                          
+                          {/* This is a ternary operator. It checks if a discount exists. */}
+                          {game.originalPrice && game.originalPrice > game.price ? (
+                            // IF TRUE (There is a discount), render this complex layout:
+                            <>
+                              <span className="discount-badge badge p-2">
+                                -{calculateDiscount(game).toFixed(0)}%
+                              </span>
+                              <div className='price-container'>
+                                <del className="game-price-original">
+                                  €{game.originalPrice.toFixed(2)}
+                                </del>
+                                <span className="game-price-final">
+                                  €{game.price.toFixed(2)}
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <span className="game-price-final">
+                              {game.price === 0 ? 'Free' : `€${game.price.toFixed(2)}`}
+                            </span>
+                          )}
+                        </div>
+                        {/* === END: NEW UPDATED PRICE DISPLAY LOGIC === */}
+                    </div>
                   </div>
                 </div>
               ))}

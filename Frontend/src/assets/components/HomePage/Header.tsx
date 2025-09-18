@@ -26,7 +26,7 @@ const Header = () => {
       <div className="header-search flex-grow-1 mx-4">
         {/* 'form-control': Η μαγική κλάση του Bootstrap για input πεδία. Τους δίνει σωστό padding, border, κ.λπ. */}
         {/* 'header-search-input': Η δική μας κλάση για το custom background και χρώμα κειμένου. */}
-        <input type="text" className="form-control header-search-input" placeholder="Search for games, consoles & more..." />
+        <input type="text" className="form-control header-search-input" placeholder="Search for games..." />
       </div>
 
       {/* --- Μενού Πλοήγησης --- */}
