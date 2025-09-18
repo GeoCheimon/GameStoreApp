@@ -23,7 +23,7 @@ interface Category {
 // --- Mock Data (Ψεύτικα Δεδομένα) ---
 export const categories: Category[] = [
   { id: 1, name: 'ACTION' },
-  { id: 2, name: 'ROLES' },
+  { id: 2, name: 'RPG' },
   { id: 3, name: 'STRATEGY' },
   { id: 4, name: 'ADVENTURE' },
   { id: 5, name: 'SIMULATION' },
@@ -33,7 +33,7 @@ export const categories: Category[] = [
   // --- ΣΧΟΛΙΟ: Mapping για display names ---
   export const displayNameMap: { [key: string]: string } = {
     'ACTION': 'Action',
-    'ROLES': 'RPG', 
+    'RPG': 'RPG', 
     'STRATEGY': 'Strategy',
     'ADVENTURE': 'Adventure',
     'SIMULATION': 'Simulation',
