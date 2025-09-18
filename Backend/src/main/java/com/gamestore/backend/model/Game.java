@@ -20,6 +20,10 @@ public class Game {
     private String category;
     @Getter
     private double price;
+
+    @Getter
+    @Column(name = "orignal_price")// Είναι για την αρχικη τιμη που θα εμφανιζεται αν εχει εκπτωση
+    private Double orignalPrice;
     @Getter
     @Column(name = "image_url")
     private String imageUrl;
