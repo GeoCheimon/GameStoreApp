@@ -3,29 +3,28 @@ package com.gamestore.backend.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+// By placing @Getter at the class level, Lombok automatically creates a getter for every field.
+// This makes the code cleaner.
+@Getter
 @Entity
-@Table (name = "games") // Αυτο το εβαλα γιατι το spring boot δημιουργουσε τον πινακα με το ονομα game και οχι games
-// που ειναι το ονομα της βασης μου στο MySQL
+@Table (name = "games")
 public class Game {
-    // --- Πρόσθεσε Getters για όλα τα πεδία ---
-    @Getter
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
-    @Getter
     private String name;
-    @Getter
     private String category;
-    @Getter
     private double price;
 
-    @Getter
-    @Column(name = "orignal_price")// Είναι για την αρχικη τιμη που θα εμφανιζεται αν εχει εκπτωση
-    private Double orignalPrice;
-    @Getter
+    // This now correctly maps to the 'original_price' column in your database.
+    @Column(name = "original_price")
+    private Double originalPrice;
+
     @Column(name = "image_url")
     private String imageUrl;
 
+    // Note: Since @Getter is on the class, you don't need individual @Getter annotations here anymore.
+    // Lombok handles it all.
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.criteria.Predicate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -28,7 +29,11 @@ public class GameService {
 
             // Αν υπάρχει φίλτρο κατηγορίας, προσθέτουμε τη συνθήκη
             if (category != null && !category.isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+                // Split the comma-separated string from the URL (e.g., "RPG,Strategy") into a List of strings.
+                List<String> categories = Arrays.asList(category.split(","));
+                // Add a condition that checks if the game's category is IN the provided list.
+                // This generates an SQL "WHERE category IN ('RPG', 'Strategy')" clause.
+                predicates.add(root.get("category").in(categories));
             }
             // Αν υπάρχει φίλτρο μέγιστης τιμής, προσθέτουμε τη συνθήκη
             if (maxPrice != null) {
