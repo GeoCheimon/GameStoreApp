@@ -23,7 +23,11 @@ interface Game {
 // --- React Component ---
 // Δεν δηλώνουμε ρητά τύπο επιστροφής (TS καταλαβαίνει JSX.Element).
 const GamesPage = () => {
-  const [sortOption, setSortOption] = useState<"title-asc" | "title-desc" | "price-asc" | "price-desc" | "discount">("title-asc");
+  // --- FIX: Moved the SortOption type definition inside the component ---
+  // This ensures it's always in scope for the state and handler functions.
+  type SortOption = "title-A_to_Z" | "title-Z_to_A" | "price-L_to_H" | "price-H_to_L" | "discount";
+
+  const [sortOption, setSortOption] = useState<SortOption>("title-A_to_Z");
   // ADD: State για τα παιχνίδια, το loading και τα errors
   // --- ΣΧΟΛΙΟ React: useState Hooks ---
   // Αυτά τα hooks δημιουργούν state για το component.
@@ -51,11 +55,15 @@ const GamesPage = () => {
     const maxPrice = searchParams.get('maxPrice');
     const free = searchParams.get('free');
     const discounted = searchParams.get('discounted');
+    // 1. Get the 'name' parameter from the URL
+    const name = searchParams.get('name');
 
+    
     // ( new changes) ΔΙΟΡΘΩΣΗ: Το apiUrl πρέπει να είναι σε ΜΙΑ γραμμή χωρίς νέες γραμμές μέσα στο template literal
     // Η νέα γραμμή μπορεί να κάνει το URL άκυρο και να προκαλέσει σφάλμα στο fetch.
-    const apiUrl = `http://localhost:8080/api/games?category=${category || ''}&maxPrice=${maxPrice || ''}&free=${free || ''}&discounted=${discounted || ''}`;
-
+    
+    // 2. Add the 'name' parameter to the API URL
+    const apiUrl = `http://localhost:8080/api/games?category=${category || ''}&maxPrice=${maxPrice || ''}&free=${free || ''}&discounted=${discounted || ''}&name=${name || ''}`;
     /*για να έχεις πιο λεπτομερή πληροφορία στη σελίδα GamesPage 
     για το ποια κατηγορία έχει επιλεχθεί */
     setLoading(true); // Ξεκινάμε το loading
@@ -100,19 +108,19 @@ const GamesPage = () => {
     const gamesToSort = [...games];
 
     switch (sortOption) {
-      case 'price-asc':
+      case 'price-L_to_H':
         // Sorts by price, from the lowest to the highest.
         return gamesToSort.sort((a, b) => a.price - b.price);
-      
-      case 'price-desc':
+
+      case 'price-H_to_L':
         // Sorts by price, from the highest to the lowest.
         return gamesToSort.sort((a, b) => b.price - a.price);
-      
-      case 'title-asc':
+
+      case 'title-A_to_Z':
         // Sorts by name alphabetically (A-Z), using localeCompare for proper string comparison.
         return gamesToSort.sort((a, b) => a.name.localeCompare(b.name));
-      
-      case 'title-desc':
+
+      case 'title-Z_to_A':
         // Sorts by name in reverse alphabetical order (Z-A).
         return gamesToSort.sort((a, b) => b.name.localeCompare(a.name));
       
@@ -142,6 +150,22 @@ const GamesPage = () => {
       return newParams;
     }, { replace: true });
   };
+
+  // --- NEW: A dedicated handler for sort changes ---
+  // This function ensures that when the user wants to sort, any specific game search is cleared first.
+  const handleSortChange = (newSortOption: SortOption) => {
+      // First, update the URL to remove the 'name' parameter.
+      // This allows sorting to apply to the broader list of filtered games, not just the single searched one.
+      setSearchParams(prevParams => {
+          const newParams = new URLSearchParams(prevParams.toString());
+          newParams.delete('name');
+          return newParams;
+      }, { replace: true });
+
+      // Then, update the local state to apply the new sorting order to the re-fetched list.
+      setSortOption(newSortOption);
+  };
+
   return (
     <>
       <Header />
@@ -211,7 +235,7 @@ const GamesPage = () => {
               <button className="btn btn-outline-secondary btn-sm px-3 ms-auto">
                 Sort: Default
               </button>*/}
-              <SortBy selected={sortOption} onSortChange={setSortOption} />
+              <SortBy selected={sortOption} onSortChange={handleSortChange} />
             </div>
             
             {/* ADD: Έλεγχος για loading και error states */}

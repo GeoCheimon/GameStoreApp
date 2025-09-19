@@ -11,13 +11,27 @@
   letter-spacing: 1px;
 }
 
+/* --- NEW: Wrapper to center the search bar --- */
+/* Αυτό το container πιάνει τον ευέλικτο χώρο και κεντράρει τη φόρμα μέσα του. */
+.header-search-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* --- NEW: The form itself now has the max-width and is the relative parent --- */
+/* Η φόρμα τώρα ορίζει το μέγιστο πλάτος και λειτουργεί ως "γονέας" για το dropdown. */
+.header-search {
+  position: relative; /* Απαραίτητο για το absolute positioning του παιδιού */
+  width: 100%;
+  max-width: 600px; /* Ορίζουμε εδώ το μέγιστο πλάτος */
+}
+
 /* Custom στυλ για το input που αναιρούν το default του Bootstrap */
 .header-search-input {
   background-color: #1f3a5f;
   border: 1px solid #1f3a5f;
   color: #ccd6f6;
-  max-width: 600px; /* Κρατάμε το μέγιστο πλάτος */
-  margin: 0 auto; /* Το κεντράρουμε μέσα στο container του */
+  width: 100%; /* Το input πιάνει όλο το πλάτος της φόρμας (.header-search) */
 }
 
 /* Αλλάζουμε το χρώμα του placeholder για να ταιριάζει */
@@ -52,4 +66,45 @@
 /* Το custom χρώμα για το εικονίδιο */
 .nav-icon {
   color: #64ffda;
+}
+
+/* --- Styling for Search Suggestions --- */
+.search-suggestions-container {
+  position: absolute;
+  top: 100%; /* Εμφανίζεται ακριβώς κάτω από το input */
+  left: 0;
+  right: 0;
+  width: 100%; /* Παίρνει το πλάτος του γονέα του (.header-search), λύνοντας το πρόβλημα */
+  background-color: #23272b; /* Συμπαγές σκούρο γκρι */
+  border: 1px solid #343a40;
+  border-top: none;
+  border-radius: 0 0 8px 8px; /* Στρογγυλεμένες γωνίες κάτω */
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+  color: #e2e8f0;
+  box-shadow: 0 8px 24px rgba(3, 9, 20, 0.6); /* Σκιά για "βάθος" */
+}
+
+.suggestion-group {
+    padding: 0.5rem 0;
+}
+
+.suggestion-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #a0aec0;
+    padding: 0.25rem 1rem;
+    margin: 0;
+}
+
+.suggestion-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.suggestion-item:hover {
+  background-color: #2d3748; /* Αλλαγή χρώματος στο hover */
 }

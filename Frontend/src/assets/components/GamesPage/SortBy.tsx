@@ -4,19 +4,19 @@ import './SortBy.css';
 
 // Defines the available sorting options
 type SortOption =
-  | "title-asc"
-  | "title-desc"
-  | "price-asc"
-  | "price-desc"
+  | "title-A_to_Z"
+  | "title-Z_to_A"
+  | "price-L_to_H"
+  | "price-H_to_L"
   | "discount";
 
 // Maps sort option values to human-readable labels
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
+  { value: "price-L_to_H", label: "Price: Low to High" },
+  { value: "price-H_to_L", label: "Price: High to Low" },
   { value: "discount", label: "Discount: From Highest" },
-  { value: "title-asc", label: "Title (A-Z)" },
-  { value: "title-desc", label: "Title (Z-A)" },
+  { value: "title-A_to_Z", label: "Title (A-Z)" },
+  { value: "title-Z_to_A", label: "Title (Z-A)" },
 ];
 
 interface SortByProps {
@@ -30,7 +30,7 @@ const SortBy: React.FC<SortByProps> = ({ onSortChange, selected }) => {
 
   // Finds the label for the currently selected sort option
   const selectedLabel =
-    SORT_OPTIONS.find((opt) => opt.value === selected)?.label || "Sort";
+    SORT_OPTIONS.find((opt) => opt.value === selected)?.label || SORT_OPTIONS[3].label;
 
   // Effect to close the dropdown if user clicks outside of it
   useEffect(() => {
