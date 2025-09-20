@@ -11,19 +11,28 @@
   letter-spacing: 1px;
 }
 
-/* --- NEW: Wrapper to center the search bar --- */
-/* Αυτό το container πιάνει τον ευέλικτο χώρο και κεντράρει τη φόρμα μέσα του. */
+/* --- NEW: Center Section Container: Menu + Search Bar --- */
+/* Αυτό το container ομαδοποιεί το μενού και την αναζήτηση και τα στοιχίζει. */
+.header-center-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem; /* Δημιουργεί το κενό ανάμεσα στο κουμπί του μενού και τη μπάρα αναζήτησης */
+}
+
+/* Wrapper for the search bar */
+/* Αυτό το container απλά πιάνει τον ευέλικτο χώρο. */
 .header-search-wrapper {
   display: flex;
   justify-content: center;
 }
 
-/* --- NEW: The form itself now has the max-width and is the relative parent --- */
+/* The form itself now has the max-width and is the relative parent */
 /* Η φόρμα τώρα ορίζει το μέγιστο πλάτος και λειτουργεί ως "γονέας" για το dropdown. */
 .header-search {
-  position: relative; /* Απαραίτητο για το absolute positioning του παιδιού */
-  width: 100%;
-  max-width: 600px; /* Ορίζουμε εδώ το μέγιστο πλάτος */
+  position: relative;
+  width: 600px; /* Ορίζουμε ένα σταθερό, μεγάλο πλάτος */
+  max-width: 600px;
 }
 
 /* Custom στυλ για το input που αναιρούν το default του Bootstrap */
@@ -107,4 +116,26 @@
 
 .suggestion-item:hover {
   background-color: #2d3748; /* Αλλαγή χρώματος στο hover */
+}
+
+/* --- Styling for the Nav Menu (Hamburger) --- */
+.nav-menu-wrapper {
+  position: relative;
+}
+
+.nav-menu-button {
+  background: none;
+  border: none;
+  color: #64ffda; /* Το χαρακτηριστικό σου χρώμα */
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.nav-menu-button:hover {
+  background-color: rgba(100, 255, 218, 0.1);
 }
