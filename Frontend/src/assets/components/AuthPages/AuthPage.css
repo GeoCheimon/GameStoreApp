@@ -1,0 +1,78 @@
+.auth-container {
+  min-height: 100vh; 
+  background-color: #0b192f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+.auth-form-wrapper {
+  background-color: #23272b;
+  padding: 2.5rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 450px;
+  color: #ccd6f6;
+  border: 1px solid #343a40;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.auth-title {
+  color: #64ffda;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+.form-label {
+  color: #a0aec0; /* Changed for better contrast */
+  font-size: 0.9rem;
+}
+
+.auth-input {
+  background-color: #0b192f !important;
+  color: #ccd6f6 !important;
+  border: 1px solid #343a40 !important;
+}
+
+.auth-input:focus {
+  border-color: #64ffda !important;
+  box-shadow: 0 0 0 0.25rem rgba(100, 255, 218, 0.25) !important;
+}
+
+/* --- FIX: Updated button style for better visibility & specificity --- */
+/* Στοχεύουμε το κουμπί πιο συγκεκριμένα (με .btn.auth-button) για να "νικήσουμε" τυχόν κανόνες του Bootstrap */
+.btn.auth-button {
+  background-color: #64ffda; /* Συμπαγές χρώμα, ίδιο με του τίτλου */
+  border-color: #64ffda; /* Βεβαιωνόμαστε ότι και το border έχει το ίδιο χρώμα */
+  color: #0b192f; /* Σκούρο χρώμα κειμένου για αντίθεση */
+  padding: 0.5rem;
+  font-weight: bold;
+  transition: opacity 0.2s ease;
+}
+
+/* Hover effect */
+.btn.auth-button:hover {
+  opacity: 0.8; /* Κάνουμε το κουμπί ελαφρώς πιο αχνό στο hover για feedback */
+  background-color: #64ffda; /* Εξασφαλίζουμε ότι το background παραμένει ίδιο */
+  color: #0b192f; /* Εξασφαλίζουμε ότι το χρώμα του κειμένου παραμένει ίδιο */
+}
+
+.auth-switch-text {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #a0aec0;
+}
+
+.auth-switch-text a {
+  color: #64ffda;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.auth-switch-text a:hover {
+  text-decoration: underline;
+}
+

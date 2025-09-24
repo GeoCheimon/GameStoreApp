@@ -85,10 +85,6 @@ const CategoryCarousel = () => {
   // Αυτό μας επιτρέπει να "πιάσουμε" ένα συγκεκριμένο HTML element (το div που σκρολάρει)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-
-
-
-  
   // Συνάρτηση χειρισμού scroll (με κυκλικό loop).
   const handleScroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
