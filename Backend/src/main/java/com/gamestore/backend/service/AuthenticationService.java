@@ -5,34 +5,49 @@ import com.gamestore.backend.dto.RegisterRequestDTO;
 import com.gamestore.backend.model.User;
 import com.gamestore.backend.repository.UserRepository;
 import com.gamestore.backend.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AuthenticationService {
 
-    // Οι Εξαρτήσεις (Τα "Υλικά" της Συνταγής)
-    @Autowired
-    private UserRepository userRepository;
+    // Εδω γίνεται dependency injection μέσω constructor. Αυτο ειναι η προτεινόμενη πρακτική.
+    // Γιατί constructor injection?
+    // 1. Ασφάλεια: Οι εξαρτήσεις είναι final και δεν μπορούν να αλλάξουν μετά την αρχικοποίηση.
+    // 2. Ευκολία στο testing: Μπορούμε εύκολα να περάσουμε mock αντικείμενα κατά τη διάρκεια των tests.
+    // 3. Καθαρότητα: Είναι ξεκάθαρο ποιες εξαρτήσεις χρειάζεται η κλάση για να λειτουργήσει.
+    // 4. Αποφυγή NullPointerExceptions: Εξασφαλίζει ότι όλες οι εξαρτήσεις είναι αρχικοποιημένες πριν χρησιμοποιηθούν.
 
-    @Autowired
-    private PasswordEncoder passwordEncoder; // Ζητάμε από το Spring το εργαλείο κρυπτογράφησης που φτιάξαμε
+    // Οι εξαρτήσεις δηλώνονται ως final για να εξασφαλίσουμε ότι θα αρχικοποιηθούν μία φορά μέσω του constructor.
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    // Constructor Injection
+    // Αντί για @Autowired, το Spring θα "δει" αυτόν τον public constructor και θα περάσει αυτόματα
+    // τα απαραίτητα "υλικά" (beans) ως ορίσματα.
+    public AuthenticationService(
+            UserRepository userRepository, // Ζητάμε από το Spring το UserRepository που φτιάξαμε.
+            PasswordEncoder passwordEncoder, // Ζητάμε από το Spring το εργαλείο κρυπτογράφησης που φτιάξαμε.
+            AuthenticationManager authenticationManager, // Ζητάμε το AuthenticationManager, το επίσημο εργαλείο του Spring για την επαλήθευση στοιχείων.
+            JwtUtil jwtUtil // Ζητάμε το εργαλείο "JwtUtil", για τη δημιουργία των tokens.
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+    }
 
-    // Ζητάμε από το Spring το AuthenticationManager που φτιάξαμε στο SecurityConfig.
-    // Αυτό είναι το επίσημο εργαλείο του Spring για την επαλήθευση στοιχείων.
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    // Ζητάμε το εργαλείο "JwtUtil", για τη δημιουργία των tokens.
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    public User registerUser(RegisterRequestDTO registerRequest) {
+    public void registerUser(RegisterRequestDTO registerRequest) {
         // Έλεγχος αν το email υπάρχει ήδη για να αποφύγουμε διπλούς λογαριασμούς
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             // Αν υπάρχει, "πετάμε" ένα σφάλμα που θα πιάσει ο Controller
@@ -51,7 +66,7 @@ public class AuthenticationService {
         newUser.setRole("ROLE_USER");
 
         // Αποθηκεύουμε τον νέο χρήστη στη βάση δεδομένων και επιστρέφουμε το αποθηκευμένο αντικείμενο
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
     }
 
     // Η "Συνταγή" για το Login
@@ -61,37 +76,40 @@ public class AuthenticationService {
      * @return Ένα string που είναι το υπογεγραμμένο JWT token.
      */
     public String loginUser(LoginRequestDTO loginRequest) {
-        // Βήμα 1: Η Επαλήθευση
+        // Βήμα 1: Η Επαλήθευση των credentials (email/password)
         // Δίνουμε στο AuthenticationManager (που ειναι στο SecurityConfig) το email και τον κωδικό που έδωσε ο χρήστης.
         // Αυτόματα, το Spring Security θα:
         //   1. Βρει τον χρήστη στη βάση με βάση το email.
         //   2. Πάρει τον κρυπτογραφημένο κωδικό από τη βάση.
         //   3. Κρυπτογραφήσει τον κωδικό που έδωσε ο χρήστης τώρα.
         //   4. Συγκρίνει τα δύο hashes. Αν δεν ταιριάζουν, θα "πετάξει" ένα σφάλμα (Exception).
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
         );
 
-        // Βήμα 2: Επίσημη Αναγνώριση
-        // Αν ο παραπάνω έλεγχος πετύχει (δεν πετάξει σφάλμα), σημαίνει ότι ο χρήστης είναι ο σωστός.
-        // Αποθηκεύουμε την "ταυτότητά" του στο SecurityContextHolder.
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        //Τι κάνει αυτό; Κρατάει την "ταυτότητα" του χρήστη για όλη τη διάρκεια του αιτήματος (request).
-        // Έτσι, αν μέσα σε αυτό το αίτημα χρειαστεί να ξέρουμε ποιος είναι ο χρήστης,
-        // μπορούμε να το βρούμε εύκολα από το SecurityContextHolder.
-
-        // "Ολη τη διάρκεια του αιτήματος (request)" σημαίνει όσο ειναι συνδεδεμένος ο χρηστης;
-        // Οχι. Σημαίνει μόνο για το συγκεκριμένο αίτημα. Αν ο χρήστης κάνει ένα νέο αίτημα,
-        // θα χρειαστεί να ξανακάνει login ή να στείλει το JWT
-
-        // Βήμα 3: Δημιουργία του "Διαβατηρίου"
-
-        // Βρίσκουμε τον χρήστη από τη βάση για να πάρουμε το username ---
+        // Βήμα 2: Φέρνουμε το User entity ΜΙΑ ΦΟΡΑ από τη βάση.
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found after successful authentication"));
 
-        // Καλούμε το JwtUtil για να δημιουργήσει ένα νέο token με βάση το email του χρήστη και το επιστρέφουμε.
-        // --- CHANGE: Δίνουμε και το username στη μέθοδο generateToken ---
-        return jwtUtil.generateToken(user.getEmail(), user.getUsername());
+        // Βήμα 3: Δημιουργούμε ένα αντικείμενο UserDetails από το User entity.
+        // Αυτό είναι το αντικείμενο που καταλαβαίνει το Spring Security.
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole()))
+        );
+
+        // Βήμα 4: Δημιουργούμε τα extra claims που θέλουμε στο token.
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("username", user.getUsername());
+
+        // Προσθέτουμε τον ρόλο στα claims
+        extraClaims.put("role", user.getRole());
+
+        // Βήμα 5: Δημιουργία του Token, δίνοντας το UserDetails αντικείmeno.
+        return jwtUtil.generateToken(extraClaims, userDetails);
     }
 }

@@ -4,7 +4,6 @@
     import com.gamestore.backend.dto.LoginResponseDTO;
     import com.gamestore.backend.dto.RegisterRequestDTO;
     import com.gamestore.backend.service.AuthenticationService;
-    import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +14,21 @@
     @RequestMapping("/api/authentication")
     // @CrossOrigin: Επιτρέπει στο frontend μας (που τρέχει στο localhost:5173) να επικοινωνεί με αυτό το API.
     @CrossOrigin(origins = "http://localhost:5173")
-    public class AuthenticationController {
-        @Autowired // Dependency Injection ("field injection"): Ζητάμε από το Spring να μας δώσει το AuthenticationService.
-        private AuthenticationService authenticationService;
 
+    @SuppressWarnings("unused")
+    public class AuthenticationController {
+
+        /*@Autowired Dependency Injection ("field injection"): Ζητάμε από το Spring να μας δώσει το AuthenticationService.
+        private AuthenticationService authenticationService;*/
+
+        private final AuthenticationService authenticationService;
+
+        // Προσθέτουμε τον constructor injection για το AuthenticationService.
+        // Το Spring θα βρει το AuthenticationService και θα το περάσει αυτόματα εδώ.
+        public AuthenticationController(AuthenticationService authenticationService) {
+            this.authenticationService = authenticationService;
+        }
+        // endpoint για το Register
         @PostMapping("/register") //Ορίζει ότι αυτή η μέθοδος θα εκτελείται όταν έρχεται ένα POST request στο /api/auth/register
         public ResponseEntity<?> registerUser(@RequestBody RegisterRequestDTO registerRequest) {
             // @RequestBody: Λέει στο Spring να πάρει το JSON σώμα του request και να το μετατρέψει
@@ -41,12 +51,12 @@
             }
         }
 
-        // --- NEW: Το endpoint για το Login ---
-        /**
-         * Χειρίζεται τα POST requests στη διεύθυνση /api/authentication/login.
-         * @param loginRequest Το DTO που περιέχει το email και τον κωδικό του χρήστη από το σώμα του request.
-         * @return Ένα ResponseEntity που περιέχει το JWT token αν η σύνδεση είναι επιτυχής,
-         * ή ένα μήνυμα σφάλματος αν αποτύχει.
+        // endpoint για το Login
+        /*
+         Χειρίζεται τα POST requests στη διεύθυνση /api/authentication/login.
+         @param loginRequest Το DTO που περιέχει το email και τον κωδικό του χρήστη από το σώμα του request.
+         @return Ένα ResponseEntity που περιέχει το JWT token αν η σύνδεση είναι επιτυχής,
+         ή ένα μήνυμα σφάλματος αν αποτύχει.
          */
         @PostMapping("/login")
         public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
