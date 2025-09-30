@@ -5,6 +5,8 @@ import './GamesPage.css';
 import SortBy from './SortBy';
 import { useSearchParams } from 'react-router-dom'; // CHANGE: Import useSearchParams
 import placeholderImage from '../../images/placeholder.svg';
+import { FaHeart } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 // ADD: Ορίζουμε τον τύπο για τα δεδομένα του παιχνιδιού
 interface Game {
@@ -36,6 +38,10 @@ const GamesPage = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState<boolean>(true);// Αρχικοποιούμε με true για να δείχνουμε "Loading" στην αρχή
   const [error, setError] = useState<string | null>(null);
+  // Χρησιμοποιούμε ένα Set για γρήγορη αναζήτηση (O(1) lookup).
+  const [wishlistIds, setWishlistIds] = useState<Set<number>>(new Set());
+  // State για να κρατάμε τα IDs των παιχνιδιών που κατέχει ο χρήστης
+  const [ownedGameIds, setOwnedGameIds] = useState<Set<number>>(new Set());
 
 
   // --- ΣΧΟΛΙΟ React: useSearchParams Hook ---
@@ -58,10 +64,10 @@ const GamesPage = () => {
     // 1. Get the 'name' parameter from the URL
     const name = searchParams.get('name');
 
-    
+
     // ( new changes) ΔΙΟΡΘΩΣΗ: Το apiUrl πρέπει να είναι σε ΜΙΑ γραμμή χωρίς νέες γραμμές μέσα στο template literal
     // Η νέα γραμμή μπορεί να κάνει το URL άκυρο και να προκαλέσει σφάλμα στο fetch.
-    
+
     // 2. Add the 'name' parameter to the API URL
     const apiUrl = `http://localhost:8080/api/games?category=${category || ''}&maxPrice=${maxPrice || ''}&free=${free || ''}&discounted=${discounted || ''}&name=${name || ''}`;
     /*για να έχεις πιο λεπτομερή πληροφορία στη σελίδα GamesPage 
@@ -89,8 +95,66 @@ const GamesPage = () => {
         setLoading(false); // Σταματάμε το loading
       });
   }, [searchParams]); // Το useEffect τρέχει κάθε φορά που αλλάζουν τα searchParams
-  
-  // NEW: Helper function to calculate the discount percentage for a game.
+
+  // useEffect για να φέρει το wishlist του χρήστη όταν φορτώνει η σελίδα
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        // Αν δεν υπάρχει token, δεν κάνουμε τίποτα.
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8080/api/wishlist', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const wishlistData: Game[] = await response.json();
+          // Παίρνουμε τα IDs από τα παιχνίδια και τα βάζουμε στο state.
+          const ids = new Set(wishlistData.map(item => item.id));
+          setWishlistIds(ids);
+        }
+      } catch (error) {
+        console.error("Failed to fetch wishlist on page load:", error);
+      }
+    };
+
+    fetchWishlist();
+  }, []); // Το κενό array σημαίνει ότι θα τρέξει μόνο μία φορά, κατά την αρχική φόρτωση.
+
+  // Θα φέρνουμε και το wishlist και τη βιβλιοθήκη μαζί
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) return;
+
+      try {
+        // Παράλληλες κλήσεις για καλύτερη απόδοση
+        const [wishlistRes, libraryRes] = await Promise.all([
+          fetch('http://localhost:8080/api/wishlist', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('http://localhost:8080/api/library', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        if (wishlistRes.ok) {
+          const wishlistData: Game[] = await wishlistRes.json();
+          setWishlistIds(new Set(wishlistData.map(item => item.id)));
+        }
+        if (libraryRes.ok) {
+          const libraryData: Game[] = await libraryRes.json();
+          setOwnedGameIds(new Set(libraryData.map(item => item.id)));
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  // Helper function to calculate the discount percentage for a game.
   // This is needed for the 'discount' sort option.
   const calculateDiscount = (game: Game): number => {
     // If there's no original price or the price is not lower, there's no discount.
@@ -123,11 +187,11 @@ const GamesPage = () => {
       case 'title-Z_to_A':
         // Sorts by name in reverse alphabetical order (Z-A).
         return gamesToSort.sort((a, b) => b.name.localeCompare(a.name));
-      
+
       case 'discount':
         // Sorts by the calculated discount percentage, from the highest to the lowest.
         return gamesToSort.sort((a, b) => calculateDiscount(b) - calculateDiscount(a));
-      
+
       default:
         // If no sort option matches, return the original (unsorted) array.
         return gamesToSort;
@@ -151,19 +215,91 @@ const GamesPage = () => {
     }, { replace: true });
   };
 
-  // --- NEW: A dedicated handler for sort changes ---
+  // A dedicated handler for sort changes ---
   // This function ensures that when the user wants to sort, any specific game search is cleared first.
   const handleSortChange = (newSortOption: SortOption) => {
-      // First, update the URL to remove the 'name' parameter.
-      // This allows sorting to apply to the broader list of filtered games, not just the single searched one.
-      setSearchParams(prevParams => {
-          const newParams = new URLSearchParams(prevParams.toString());
-          newParams.delete('name');
-          return newParams;
-      }, { replace: true });
+    // First, update the URL to remove the 'name' parameter.
+    // This allows sorting to apply to the broader list of filtered games, not just the single searched one.
+    setSearchParams(prevParams => {
+      const newParams = new URLSearchParams(prevParams.toString());
+      newParams.delete('name');
+      return newParams;
+    }, { replace: true });
 
-      // Then, update the local state to apply the new sorting order to the re-fetched list.
-      setSortOption(newSortOption);
+    // Then, update the local state to apply the new sorting order to the re-fetched list.
+    setSortOption(newSortOption);
+  };
+
+  // Συνάρτηση για προσθήκη/Αφαιρεση = toggle στο/απο Wishlist
+  const handleToggleWishlist = async (game: Game) => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      alert("Please log in to manage your wishlist.");
+      return;
+    }
+
+    const isWishlisted = wishlistIds.has(game.id);
+    const method = isWishlisted ? 'DELETE' : 'POST';
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/wishlist/${game.id}`, {
+        method: method,
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to update wishlist.");
+      }
+
+      // Ενημερώνουμε το τοπικό state για άμεση αλλαγή στο UI
+      if (isWishlisted) {
+        // Αφαίρεση του ID από το Set
+        setWishlistIds(prevIds => {
+          const newIds = new Set(prevIds);
+          newIds.delete(game.id);
+          return newIds;
+        });
+      } else {
+        // Προσθήκη του ID στο Set
+        setWishlistIds(prevIds => {
+          const newIds = new Set(prevIds);
+          newIds.add(game.id);
+          return newIds;
+        });
+      }
+
+    } catch (error: any) {
+      console.error("Error updating wishlist:", error);
+      alert(error.message);
+    }
+  };
+
+  // --- NEW: Συνάρτηση για προσθήκη στο Cart ---
+  const handleAddToCart = async (gameId: number) => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      alert("Please log in to add items to your cart.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/cart/${gameId}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to add to cart.");
+      }
+
+      alert("Game added to your cart!");
+
+    } catch (error: any) {
+      console.error("Error adding to cart:", error);
+      alert(error.message);
+    }
   };
 
   return (
@@ -208,7 +344,7 @@ const GamesPage = () => {
                        Το σύμβολο 'x' ΔΕΝ σχετίζεται με καμία από αυτές τις κλάσεις. 
                        Το 'x' εμφανίζεται από το <span> με το &times; παρακάτω, όχι από κάποια κλάση. */
                     className="btn btn-big btn-secondary rounded-pill d-flex align-items-center"
-                    >
+                  >
                     {genre}
                     <span
                       /* ms-2: Αριστερό περιθώριο (margin-start) μεγέθους 2.
@@ -237,7 +373,7 @@ const GamesPage = () => {
               </button>*/}
               <SortBy selected={sortOption} onSortChange={handleSortChange} />
             </div>
-            
+
             {/* ADD: Έλεγχος για loading και error states */}
             {loading && <p className="text-light">Loading games...</p>}
             {error && <p className="text-danger">{error}</p>}
@@ -247,51 +383,90 @@ const GamesPage = () => {
                 row-cols-md-3: 3 στήλες από medium breakpoint και πάνω.
                 row-cols-lg-4: 4 στήλες από large breakpoint και πάνω.
                 g-4: Κενό (gutter) μεγέθους 4 μεταξύ των στηλών. */}
-            
+
             {/* Κάνουμε map πάνω στα πραγματικά δεδομένα από το state */}
             {!loading && !error && (
-            <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-              {/* CHANGE: We now map over 'sortedGames' instead of the original 'games' array. */}
-              {sortedGames.map((game) => (
-                <div key={game.id} className="col">
-                  <div className="game-card card h-100 border-0 text-light bg-dark">
-                    <img src={game.imageUrl || placeholderImage} className="card-img-top" alt={game.name} style={{aspectRatio: '16/9', objectFit: 'cover'}} />
-                    <div className="card-body py-2 px-2 d-flex flex-column">
-                      <div className="game-name fw-semibold small text-light mb-1" style={{ fontSize: '1rem' }}>{game.name}</div>
-                      
-                      {/* === START: NEW UPDATED PRICE DISPLAY LOGIC === */}
-                        <div className={`game-meta mt-auto d-flex align-items-center ${game.originalPrice && game.originalPrice > game.price ? 'justify-content-between' : 'justify-content-end'}`}>
-                          
-                          {/* This is a ternary operator. It checks if a discount exists. */}
-                          {game.originalPrice && game.originalPrice > game.price ? (
-                            // IF TRUE (There is a discount), render this complex layout:
-                            <>
-                              <span className="discount-badge badge p-2">
-                                -{calculateDiscount(game).toFixed(0)}%
-                              </span>
-                              <div className='price-container'>
-                                <del className="game-price-original">
-                                  €{game.originalPrice.toFixed(2)}
-                                </del>
-                                <span className="game-price-final">
-                                  €{game.price.toFixed(2)}
+              <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {/* We now map over 'sortedGames' instead of the original 'games' array. */}
+
+                {/* Ξεκινάμε με { για να ξεκινήσει το σώμα της συνάρτησης */}
+                {sortedGames.map((game) => {
+
+                  // Προσθέτουμε τη λογική που απαιτεί το explicit return
+                  const isWishlisted = wishlistIds.has(game.id);
+                  // Έλεγχος αν το παιχνίδι είναι αγορασμένο
+                  const isOwned = ownedGameIds.has(game.id);
+
+                  // Προσθέτουμε ρητά τη λέξη-κλειδί 'return']
+                  return (
+                    <div key={game.id} className="col">
+                      <div className="game-card card h-100 border-0 text-light bg-dark">
+                        <img src={game.imageUrl || placeholderImage} className="card-img-top" alt={game.name} style={{ aspectRatio: '16/9', objectFit: 'cover' }} />
+                        <div className="card-body py-2 px-2 d-flex flex-column">
+                          <div className="game-name fw-semibold small text-light mb-1" style={{ fontSize: '1rem' }}>{game.name}</div>
+
+                          {/* PRICE DISPLAY LOGIC */}
+                          <div className={`game-meta d-flex align-items-center ${game.originalPrice && game.originalPrice > game.price ? 'justify-content-between' : 'justify-content-end'}`}>
+
+                            {/* This is a ternary operator. It checks if a discount exists. */}
+                            {game.originalPrice && game.originalPrice > game.price ? (
+                              // IF TRUE (There is a discount), render this complex layout:
+                              <>
+                                <span className="discount-badge badge p-2">
+                                  -{calculateDiscount(game).toFixed(0)}%
                                 </span>
-                              </div>
-                            </>
-                          ) : (
-                            <span className="game-price-final">
-                              {game.price === 0 ? 'Free' : `€${game.price.toFixed(2)}`}
-                            </span>
-                          )}
+                                <div className='price-container'>
+                                  <del className="game-price-original">
+                                    {game.originalPrice.toFixed(2)} €
+                                  </del>
+                                  <span className="game-price-final">
+                                    {game.price.toFixed(2)} €
+                                  </span>
+                                </div>
+                              </>
+                            ) : (
+                              <span className="game-price-final">
+                                {game.price === 0 ? 'Free' : `${game.price.toFixed(2)} €`}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="game-card-actions">
+                            {/* Προσθέτουμε τα onClick event --- */}
+                            {isOwned ? (
+                              // Αν το παιχνίδι είναι αγορασμένο
+                              <>
+                                <div className="game-card-owned-badge">Owned</div>
+                                <Link to="/profile/games" className="game-card-btn btn-view-library">
+                                  Go to My Library
+                                </Link>
+                              </>
+                            ) : (
+                              // Αν δεν είναι αγορασμένο
+                              <>
+                                <button className="game-card-btn btn-cart" onClick={() => handleAddToCart(game.id)}>
+                                  Add to Cart
+                                </button>
+                                {isWishlisted ? (
+                                  <button className="game-card-btn btn-wishlisted" onClick={() => handleToggleWishlist(game)}>
+                                    <FaHeart /> Wishlisted
+                                  </button>
+                                ) : (
+                                  <button className="game-card-btn btn-wishlist" onClick={() => handleToggleWishlist(game)}>
+                                    <FaHeart /> Wishlist it
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
                         </div>
-                        {/* === END: NEW UPDATED PRICE DISPLAY LOGIC === */}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
             )}
-          </main> 
+          </main>
         </div>
       </div>
     </>
