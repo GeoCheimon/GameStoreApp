@@ -4,7 +4,6 @@ import com.gamestore.backend.dto.GameDTO;
 import com.gamestore.backend.dto.SearchSuggestionDTO;
 import com.gamestore.backend.model.Game;
 import com.gamestore.backend.repository.GameRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.criteria.Predicate;
@@ -18,12 +17,19 @@ import java.util.stream.Collectors;
 @Service
 public class GameService {
 
-    @Autowired // Αυτο μπαινει γιατι θα γινει dependency injection που σημαίνει
-    //οτι το Spring θα αναλάβει να δημιουργήσει και να διαχειριστεί το αντικείμενο
-    //του GameRepository και να το εισάγει (inject) στην κλάση GameController.
-    // Δηλαδή ζητά απο το Spring να του δώσει αυτόματα ένα instance του GameRepository
-    // όταν δημιουργηθεί το GameService.
-    private GameRepository gameRepository;
+    /*@Autowired
+     Αυτο μπαινει γιατι θα γινει dependency injection που σημαίνει
+     οτι το Spring θα αναλάβει να δημιουργήσει και να διαχειριστεί το αντικείμενο
+     του GameRepository και να το εισάγει (inject) στην κλάση GameController.
+     Δηλαδή ζητά απο το Spring να του δώσει αυτόματα ένα instance του GameRepository
+     όταν δημιουργηθεί το GameService.
+    private GameRepository gameRepository;*/
+
+    // constructor injection is the preferred way of doing dependency injection
+    private final GameRepository gameRepository;
+    public GameService(GameRepository gameRepository) {
+         this.gameRepository = gameRepository;
+    }
 
     // The method now returns a List of GameDTOs instead of Game entities.
     public List<GameDTO> getFilteredGames(String category, Double maxPrice, Boolean free, Boolean discounted, String name) {
@@ -71,12 +77,12 @@ public class GameService {
                 // without getting bogged down in the details of how to iterate over collections. bogged down synomym: overwhelmed
                 // by the details of how to iterate over collections.
                 // In this case, we want to convert each Game entity into a GameDTO.
-                .map(this::convertToDto) // For each 'game' entity/model, call the conversion method.
+                .map(this::MapToDTO) // For each 'game' entity/model, call the conversion method.
                 .collect(Collectors.toList()); // Collect the results into a new list.
     }
     // A private helper method to convert a Game entity to a GameDTO. ---
     // This isolates the mapping logic in one place.
-    private GameDTO convertToDto(Game game) {
+    public GameDTO MapToDTO(Game game) {
         GameDTO dto = new GameDTO();
         dto.setId(game.getId());
         dto.setName(game.getName());

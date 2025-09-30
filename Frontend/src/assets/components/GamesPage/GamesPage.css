@@ -21,7 +21,7 @@
   min-width: 0;
 }
 
-/* --- UPDATED: Changed alignment to handle wrapping --- */
+/* Changed alignment to handle wrapping --- */
 .games-main-header {
   display: flex;
   align-items: flex-start; /* Aligns items to the top */
@@ -29,7 +29,7 @@
   gap: 1rem;
 }
 
-/* --- NEW: Container for the filter chips to allow them to wrap independently --- */
+/* Container for the filter chips to allow them to wrap independently --- */
 .filter-chips-container {
   display: flex;
   flex-wrap: wrap; /* Allows chips to wrap to the next line */
@@ -37,7 +37,7 @@
   flex-grow: 1; /* Allows this container to take up available space */
 }
 
-/* --- NEW: Rule to push SortBy to the right and prevent it from shrinking --- */
+/* Rule to push SortBy to the right and prevent it from shrinking --- */
 /* Targets the SortBy component inside the header */
 .games-main-header .sortby-dropdown {
   margin-left: auto;  /* Pushes it to the far right */
@@ -93,8 +93,6 @@
   flex-direction: column;
   gap: 0.25rem;
 }
-
-/* --- NEW AND UPDATED STYLES --- */
 
 /* Controls the game's title size */
 .game-name {
@@ -158,4 +156,88 @@
     max-width: 100%;
     width: 100%;
   }
+}
+
+/* Styling για τα κουμπιά "Add to Cart" & "Wishlist" --- */
+
+/* Το container που θα περιέχει τα δύο κουμπιά κάτω από την τιμή */
+.game-card-actions {
+    display: flex;
+    flex-direction: column; /* ΑΛΛΑΓΗ: Τα κουμπιά το ένα κάτω από το άλλο */
+    gap: 0.5rem; /* Κενό ανάμεσα στα κουμπιά */
+    margin-top: auto; /* Σπρώχνει τα κουμπιά στο κάτω μέρος της κάρτας */
+    padding-top: 0.75rem; /* Κενό από το περιεχόμενο από πάνω */
+}
+
+/* Γενικό στυλ και για τα δύο κουμπιά */
+.game-card-btn {
+    width: 100%; /* Τα κουμπιά πιάνουν όλο το πλάτος */
+    border: none;
+    padding: 0.6rem; /* ΑΛΛΑΓΗ: Λίγο μεγαλύτερο padding για ύψος */
+    font-size: 0.65rem;
+    font-weight: bold;
+    border-radius: 6px; /* Πιο στρογγυλεμένες γωνίες */
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    text-transform: uppercase;
+    display: flex; /* Για να κεντράρουμε εικονίδιο και κείμενο */
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Κενό μεταξύ εικονιδίου και κειμένου */
+}
+
+.game-card-btn:hover {
+    opacity: 0.9;
+}
+
+/* Συγκεκριμένο στυλ για το κουμπί του Wishlist (μωβ) */
+.btn-wishlist {
+    background-color: #8244ff;
+    color: white;
+}
+
+/* Συγκεκριμένο στυλ για το κουμπί του Cart (πράσινο) */
+.btn-cart {
+    background-color: #70e000; /* Πράσινο */
+    color: #121212; /* Σκούρο κείμενο */
+}
+/* Συγκεκριμένο στυλ για το κουμπί του Wishlist (όταν ΔΕΝ είναι στη λίστα) */
+.btn-wishlist {
+    background-color: transparent;
+    border: none; /* ΑΛΛΑΓΗ: Αφαιρούμε το περίγραμμα */
+    color: #a0aec0; /* Αχνό γκρι κείμενο */
+}
+
+.btn-wishlist svg {
+    color: #a0aec0; /* Αχνό γκρι εικονίδιο */
+}
+
+/* Στυλ για το κουμπί "Wishlisted" (όταν ΕΙΝΑΙ στη λίστα) */
+.btn-wishlisted {
+    background-color: transparent;
+    border: none; /* ΑΛΛΑΓΗ: Αφαιρούμε το περίγραμμα */
+    color: #ff8a00; /* Πορτοκαλί κείμενο */
+    font-weight: bold;
+}
+
+.btn-wishlisted svg {
+    color: #ff8a00; /* Πορτοκαλί εικονίδιο */
+}
+
+/* Styling για την κατάσταση "Owned" --- */
+.game-card-owned-badge {
+    background-color: #70e000; /* Ίδιο πράσινο με το Add to Cart */
+    color: #121212;
+    padding: 0.6rem;
+    font-size: 0.65rem;
+    font-weight: bold;
+    border-radius: 6px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.btn-view-library {
+    background-color: transparent;
+    border: 1px solid #343a40;
+    color: #a0aec0;
 }

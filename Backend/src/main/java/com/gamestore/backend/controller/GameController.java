@@ -2,10 +2,8 @@ package com.gamestore.backend.controller;
 
 import com.gamestore.backend.dto.GameDTO;
 import com.gamestore.backend.dto.SearchSuggestionDTO;
-import com.gamestore.backend.model.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.gamestore.backend.repository.GameRepository;
 import com.gamestore.backend.service.GameService;
 
 import java.util.List;
@@ -13,6 +11,8 @@ import java.util.List;
 @RestController // Δηλώνει οτι η κλάση είναι ένας controller που χειρίζεται HTTP requests
 @RequestMapping ("/api/games") // Ολα τα endpoints σε αυτην την κλάση θα ξεκινούν με /api/games
 @CrossOrigin(origins = "http://localhost:5173") // Επιτρέπει requests από το συγκεκριμένο origin: React app
+
+@SuppressWarnings("unused")
 public class GameController {
 
 

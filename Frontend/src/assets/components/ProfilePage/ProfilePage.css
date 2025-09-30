@@ -1,0 +1,273 @@
+/* Αυτό το αρχείο CSS δίνει στο layout και στο sidebar την εμφάνιση που θέλουμε, παρόμοια με
+ αυτή του Epic Store, και φροντίζει να τονίζεται το ενεργό link στο μενού. */
+
+/* Κεντρικό container για όλη τη σελίδα κάτω από το header */
+.profile-page-container {
+  min-height: calc(100vh - 80px); /* Ύψος οθόνης μείον το ύψος του Header */
+  background-color: #121212; /* Σκούρο φόντο για τη σελίδα */
+}
+
+/* Sidebar Styling */
+.profile-sidebar {
+  background-color: #23272b;
+  padding: 2rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #343a40;
+}
+
+.sidebar-section {
+    margin-bottom: 2rem;
+}
+
+.sidebar-section-title {
+    font-size: 0.8rem;
+    color: #888888;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+}
+
+.profile-nav-link {
+  color: #a0aec0;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-weight: 500;
+}
+
+.profile-nav-link:hover {
+  background-color: #2d3748;
+  color: #ffffff;
+}
+
+/* Styling για το ενεργό link (η κλάση .active προστίθεται 
+  αυτόματα από το NavLink) */
+.profile-nav-link.active {
+  background-color: #0b192f;
+  color: #64ffda;
+  font-weight: bold;
+}
+
+/* Περιεχόμενο στα δεξιά */
+.profile-content-wrapper {
+    padding: 2rem 3rem;
+}
+
+/* --- NEW: Styling για το περιεχόμενο (AccountDetails.tsx) --- */
+.account-details-container {
+  color: #e2e8f0;
+}
+
+.account-info-card {
+  background-color: #23272b;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #343a40;
+}
+
+.info-group {
+  margin-bottom: 1.5rem;
+}
+
+.info-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: #a0aec0;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.info-group p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  color: #ffffff;
+}
+
+/* Styling για τη σελίδα Wishlist */
+
+/* Το container για κάθε παιχνίδι στη λίστα */
+.wishlist-item {
+    background-color: #23272b; /* Σκούρο γκρι φόντο */
+    border-radius: 8px; /* Πιο στρογγυλεμένες γωνίες */
+    border: 1px solid #343a40; /* Διακριτικό περίγραμμα αντί για λευκό */
+    padding: 0.75rem;
+    margin-bottom: 0.75rem; /* Κενό μεταξύ των αντικειμένων */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease-in-out; /* Ομαλό hover effect */
+    color: #e2e8f0; /* Φωτεινό χρώμα για το κείμενο */
+}
+
+/* Το hover effect που ζήτησες */
+.wishlist-item:hover {
+    background-color: #2d3748; /* Ελαφρώς πιο ανοιχτό γκρι στο hover */
+    cursor: default; /* Ο κέρσορας παραμένει κανονικός */
+}
+
+/* Το container για τα κουμπιά "Add to Cart" και "Remove" */
+.wishlist-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Κενό μεταξύ των κουμπιών */
+}
+
+/* Styling για τις επικεφαλίδες των Transactions --- */
+/* Το header του " πίνακα" των συναλλαγών */
+.transaction-list-header {
+    display: grid; /* Χρήση Grid για τέλεια στοίχιση στηλών */
+    grid-template-columns: 1fr 2fr 1fr; /* 3 στήλες με αναλογίες πλάτους */
+    gap: 1rem;
+    padding: 0 1rem 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #343a40;
+    
+    color: #e2e8f0; /* Φωτεινό χρώμα για το κείμενο */
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+/* Κάθε γραμμή (container) μιας συναλλαγής */
+.transaction-list-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Ίδιες αναλογίες με το header */
+    gap: 1rem;
+    align-items: center;
+    
+    background-color: #23272b;
+    color: #e2e8f0; /* Φωτεινό χρώμα για το κείμενο */
+    border-radius: 8px;
+    padding: 1.25rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.transaction-list-item:hover {
+    background-color: #2d3748; /* Ελαφρώς πιο ανοιχτό γκρι στο hover */
+    cursor: pointer; /* Αλλάζει ο κέρσορας για να δείχνει ότι είναι διαδραστικό */
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Κανόνας για να στοιχίζεται η τιμή πάντα δεξιά */
+.transaction-list-header > span:last-child,
+.transaction-list-item > span:last-child {
+    text-align: right;
+}
+
+/* --- NEW & CORRECTED: Styling για το κουμπί διαγραφής στο Cart --- */
+
+.cart-item-remove-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    width: 26px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center; /* Αυτό αναλαμβάνει την κάθετη στοίχιση */
+    justify-content: center; /* Αυτό αναλαμβάνει την οριζόντια στοίχιση */
+    font-size: 1.5rem; /* Μεγαλώνουμε λίγο το 'x' */
+    padding: 0 0 2px 0; /* ΔΙΟΡΘΩΣΗ: Προσθέτουμε 2px padding στον πάτο για να "σπρώξουμε" το 'x' οπτικά στο κέντρο */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    line-height: 1; /* Αυτό μπορεί να παραμείνει για συνέπεια */
+}
+
+.cart-item-remove-btn:hover {
+    background-color: #c82333;
+}
+
+/* Styling για τους πίνακες στις σελίδες Admin --- */
+
+/* Styling για το ManageUsers */
+
+.admin-list-header {
+    display: grid;
+    grid-template-columns: 80px 1.5fr 2fr 1fr 1fr; /* 5 στήλες */
+    gap: 1rem;
+    padding: 0 1rem 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #343a40;
+    color: #888888;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.admin-list-item {
+    display: grid;
+    grid-template-columns: 80px 1.5fr 2fr 1fr 1fr; /* Ίδιες στήλες με το header */
+    gap: 1rem;
+    align-items: center;
+    background-color: #23272b;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.admin-list-item:hover {
+    background-color: #2d3748;
+}
+
+.admin-list-item > div:last-child {
+    text-align: right;
+}
+.admin-list-header > span:last-child {
+    text-align: right;
+}
+
+/* Styling για τη σελίδα Manage Games */
+
+.admin-games-list-header {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr 1fr 150px; /* 6 στήλες */
+    gap: 1rem;
+    padding: 0 1rem 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #343a40;
+    color: #888888;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.admin-games-list-item {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr 1fr 150px; /* Ίδιες στήλες */
+    gap: 1rem;
+    align-items: center;
+    background-color: #23272b;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.admin-games-list-item:hover {
+    background-color: #2d3748;
+}
+
+.admin-games-list-item > div:last-child {
+    text-align: right;
+}
+.admin-games-list-header > span:last-child {
+    text-align: right;
+}
+
+.add-game-form {
+    background-color: #23272b;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #343a40;
+    margin-bottom: 2rem;
+}

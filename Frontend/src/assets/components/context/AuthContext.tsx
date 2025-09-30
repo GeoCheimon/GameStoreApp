@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode'; // Η νέα βιβλιοθήκη
 interface DecodedToken {
     sub: string;      // Το email του χρήστη (το standard "subject" του JWT)
     username: string; // Το username που προσθέσαμε εμείς στο backend
+    role: string;    // Προσθέτουμε το 'role' στο τι περιμένουμε από το token
     iat: number;      // Issued At timestamp
     exp: number;      // Expiration timestamp
 }
@@ -14,6 +15,7 @@ interface DecodedToken {
 // Ορίζουμε το σχήμα του αντικειμένου 'user' που θα αποθηκεύουμε στο state.
 interface User {
     username: string;
+    role: string; // Προσθέτουμε το πεδίο 'role' εδώ
 }
 
 // 1. Ορίζουμε το "σχήμα" των δεδομένων που θα αποθηκεύει το Context
@@ -35,10 +37,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
             try {
-                // --- ΑΛΛΑΓΗ: Αποκωδικοποιούμε το token χρησιμοποιώντας το νέο, πιο ακριβές interface. ---
+                // ποκωδικοποιούμε το token χρησιμοποιώντας το νέο, πιο ακριβές interface. ---
                 const decodedToken: DecodedToken = jwtDecode(token);
-                // Παίρνουμε το 'username' από το token και το αποθηκεύουμε στο state.
-                setUser({ username: decodedToken.username });
+                // Παίρνουμε το 'username' και το 'role' από το token και τα αποθηκεύουμε στο state.
+                setUser({ username: decodedToken.username, role: decodedToken.role });
             } catch (error) {
                 console.error("Invalid token found in localStorage", error);
                 localStorage.removeItem('jwtToken');
@@ -49,9 +51,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Συνάρτηση για να κάνει login
     const login = (token: string) => {
         localStorage.setItem('jwtToken', token);
-        // --- ΑΛΛΑΓΗ: Και εδώ, διαβάζουμε το 'username' από το token που μόλις λάβαμε. ---
+        // Και εδώ, διαβάζουμε το 'username' από το token που μόλις λάβαμε
         const decodedToken: DecodedToken = jwtDecode(token);
-        setUser({ username: decodedToken.username });
+        // Αποθηκεύουμε και τον ρόλο κατά το login
+        setUser({ username: decodedToken.username, role: decodedToken.role });
     };
 
     // Η συνάρτηση που καλείται από το Header για την αποσύνδεση.

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
+@SuppressWarnings("unused")
 public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificationExecutor<Game> {
     // Spring Data JPA will automatically create the basic CRUD methods for us.
     // Specifically, it will automatically understand that I want to find games based on category.

@@ -1,15 +1,19 @@
 package com.gamestore.backend.config;
 
+import com.gamestore.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,6 +26,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration // Δηλώνει ότι αυτή η κλάση περιέχει ρυθμίσεις για το Spring
 @EnableWebSecurity // Ενεργοποιεί το Spring Security στην εφαρμογή
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
 
     @Bean // Το @Bean λέει στο Spring: "Δημιούργησε αυτό το αντικείμενο και κράτα το διαθέσιμο
     // για να το χρησιμοποιήσουν άλλες κλάσεις"
@@ -75,13 +85,35 @@ public class SecurityConfig {
 
                 // 2. Ορίζουμε τους κανόνες πρόσβασης (Authorization).
                 .authorizeHttpRequests(auth -> auth
-                        // Επιτρέπουμε σε ΟΛΟΥΣ την πρόσβαση στα endpoints της αυθεντικοποίησης
-                        .requestMatchers("/api/authentication/**").permitAll()
-                        // --- FIX 2: Επιτρέπουμε σε ΟΛΟΥΣ την πρόσβαση στα endpoints των παιχνιδιών ---
-                        .requestMatchers("/api/games/**").permitAll()
-                        // Για όλα τα άλλα requests, απαιτείται έλεγχος ταυτότητας
+
+                        // A. Δημόσια Endpoints (Δεν απαιτούν login)
+                        // Επιτρέπουμε σε ΟΛΟΥΣ την πρόσβαση στα endpoints της αυθεντικοποίησης και των παιχνιδιών
+                        .requestMatchers("/api/authentication/**", "/api/games/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/games/**").permitAll() // <-- Μόνο τα GET στα games είναι δημόσια
+
+                        // B. Endpoints για Συνδεδεμένους Χρήστες (USER ή ADMIN)
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/wishlist/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/transactions/**").hasAnyRole("USER", "ADMIN")
+
+                        // Γ. Endpoints ΜΟΝΟ για ADMINS
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Οποιαδήποτε μέθοδος (GET, POST, etc.)
+                        .requestMatchers(HttpMethod.POST, "/api/games").hasRole("ADMIN") // Προσθήκη παιχνιδιού
+                        .requestMatchers(HttpMethod.PUT, "/api/games/**").hasRole("ADMIN") // Επεξεργασία
+                        .requestMatchers(HttpMethod.DELETE, "/api/games/**").hasRole("ADMIN") // Διαγραφή
+
+                        // Δ. Όλα τα υπόλοιπα απαιτούν απλά ο χρήστης να είναι συνδεδεμένος
                         .anyRequest().authenticated()
-                );
+                    )
+                    // Ορίζουμε τη διαχείριση session ως STATELESS
+                    // Αυτό λέει στο Spring Security να μην δημιουργεί HTTP Sessions.
+                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    // Προσθέτουμε το φίλτρο μας στην αλυσίδα ασφαλείας
+                    // Αυτή η γραμμή λέει στο Spring να εκτελεί το JwtAuthenticationFilter
+                    // πριν από το βασικό φίλτρο πιστοποίησης username/password.
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
