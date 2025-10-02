@@ -1,6 +1,6 @@
 package com.gamestore.backend.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        jwt = authHeader.substring(7);
+        jwt = authHeader.substring(7); // Αφαιρούμε το "Bearer " από την αρχή για να πάρουμε μόνο το token.
 
         try {
             userEmail = jwtUtil.extractUsername(jwt);
@@ -62,8 +62,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (ExpiredJwtException e) {
-            logger.warn("JWT token has expired: " + e.getMessage());
+        } catch (JwtException e) {
+            logger.warn("Invalid JWT token: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
