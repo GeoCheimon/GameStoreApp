@@ -20,12 +20,15 @@ public class JwtUtil { // Αυτό ειναι για την δημιουργία
     // Η μεταβλητή για το μυστικό κλειδί. Είναι 'final' γιατί θα αρχικοποιηθεί μία φορά στον constructor.
     private final String secretKey;
 
+    private final long jwtExpirationMs;
+
     // Constructor Injection
-    // Αντί για @Autowired σε πεδίο, το Spring θα καλέσει αυτόν τον constructor.
-    // Θα διαβάσει την τιμή από το application.properties και θα την περάσει ως όρισμα.
-    // Αυτό λύνει οριστικά την προειδοποίηση "is never assigned".
-    public JwtUtil(@Value("${jwt.secret.key}") String secretKey) {
+    public JwtUtil(
+            @Value("${jwt.secret.key}") String secretKey,
+            @Value("${jwt.expiration-ms:86400000}") long jwtExpirationMs
+    ) {
         this.secretKey = secretKey;
+        this.jwtExpirationMs = jwtExpirationMs;
     }
     // Εξάγει το username (που είναι το email) από το JWT token.
     public String extractUsername(String token) {
@@ -48,7 +51,7 @@ public class JwtUtil { // Αυτό ειναι για την δημιουργία
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername()) // Ορίζουμε το email ως το κύριο αναγνωριστικό (subject).
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Ημερομηνία δημιουργίας.
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // Ημερομηνία λήξης (24 ώρες).
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // Ημερομηνία λήξης από configuration.
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Υπογράφουμε το token με το μυστικό κλειδί.
                 .compact();
     }

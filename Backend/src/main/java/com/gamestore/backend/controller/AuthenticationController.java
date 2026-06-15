@@ -13,7 +13,7 @@
     // @RequestMapping: Ορίζει ότι όλα τα endpoints σε αυτή την κλάση θα ξεκινούν με το πρόθεμα /api/auth.
     @RequestMapping("/api/authentication")
     // @CrossOrigin: Επιτρέπει στο frontend μας (που τρέχει στο localhost:5173) να επικοινωνεί με αυτό το API.
-    @CrossOrigin(origins = "http://localhost:5173")
+    //@CrossOrigin(origins = "http://localhost:5173")
 
     @SuppressWarnings("unused")
     public class AuthenticationController {

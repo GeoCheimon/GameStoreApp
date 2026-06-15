@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController // Δηλώνει οτι η κλάση είναι ένας controller που χειρίζεται HTTP requests
 @RequestMapping ("/api/games") // Ολα τα endpoints σε αυτην την κλάση θα ξεκινούν με /api/games
-@CrossOrigin(origins = "http://localhost:5173") // Επιτρέπει requests από το συγκεκριμένο origin: React app
+//@CrossOrigin(origins = "http://localhost:5173") // Επιτρέπει requests από το συγκεκριμένο origin: React app
 
 @SuppressWarnings("unused")
 public class GameController {
