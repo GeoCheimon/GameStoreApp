@@ -32,4 +32,6 @@ yarn-error.log*
 
 # Ευαίσθητα αρχεία
 *.env
-*.properties
+
+# Ignore backend's real application.properties (but keep examples in repo)
+Backend/src/main/resources/application.properties
