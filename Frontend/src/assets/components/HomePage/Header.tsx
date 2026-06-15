@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Header.css';
 import NavMenu from './NavMenu';
+import { apiUrl } from '../../../config/api';
 
 // Ορίζουμε τους τύπους για τα δεδομένα που περιμένουμε από το API
 interface GameSuggestion {
@@ -53,7 +54,7 @@ const Header = () => {
     // σταματήσει να πληκτρολογεί για 300ms. Αυτό αποτρέπει τις άσκοπες κλήσεις.
     const delayDebounceFn = setTimeout(() => {
       if (searchTerm.length > 1) {
-        fetch(`http://localhost:8080/api/games/search?q=${searchTerm}`)
+        fetch(apiUrl(`/api/games/search?q=${searchTerm}`))
           .then(response => response.json())
           .then(data => {
             setSuggestions(data);

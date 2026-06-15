@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl } from '../../../config/api';
 
 interface Transaction {
     gameName: string;
@@ -21,7 +22,7 @@ const Transactions = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:8080/api/transactions', {
+                const response = await fetch(apiUrl('/api/transactions'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error('Failed to fetch transaction history.');

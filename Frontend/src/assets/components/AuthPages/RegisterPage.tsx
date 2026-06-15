@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './AuthPage.css'; // Το νέο, κοινό CSS
+import { apiUrl } from '../../../config/api';
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
@@ -25,7 +26,7 @@ const RegisterPage = () => {
         setSuccess(null);
 
         try {
-            const response = await fetch('http://localhost:8080/api/authentication/register', {
+            const response = await fetch(apiUrl('/api/authentication/register'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password }),

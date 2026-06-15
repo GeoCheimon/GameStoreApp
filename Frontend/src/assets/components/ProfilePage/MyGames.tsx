@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl } from '../../../config/api';
 
 // Χρησιμοποιούμε το ίδιο interface Game που έχουμε και στο GamesPage
 interface Game {
@@ -22,7 +23,7 @@ const MyGames = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:8080/api/library', {
+                const response = await fetch(apiUrl('/api/library'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error('Failed to fetch your games.');

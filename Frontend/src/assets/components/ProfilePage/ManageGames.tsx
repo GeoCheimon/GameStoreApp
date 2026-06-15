@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { apiUrl } from '../../../config/api';
 
 // Interface για τα δεδομένα ενός παιχνιδιού
 interface Game {
@@ -35,7 +36,7 @@ const ManageGames = () => {
     const fetchGames = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:8080/api/games');
+            const response = await fetch(apiUrl('/api/games'));
             if (!response.ok) throw new Error('Failed to fetch games.');
             const data = await response.json();
             setGames(data);
@@ -76,7 +77,7 @@ const ManageGames = () => {
         e.preventDefault();
         const token = localStorage.getItem('jwtToken');
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/games/${editingGameId}`, {
+            const response = await fetch(apiUrl(`/api/admin/games/${editingGameId}`), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(editFormData),
@@ -96,7 +97,7 @@ const ManageGames = () => {
         
         const token = localStorage.getItem('jwtToken');
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/games/${gameId}`, {
+            const response = await fetch(apiUrl(`/api/admin/games/${gameId}`), {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
@@ -122,7 +123,7 @@ const ManageGames = () => {
         e.preventDefault();
         const token = localStorage.getItem('jwtToken');
         try {
-            const response = await fetch('http://localhost:8080/api/admin/games', {
+            const response = await fetch(apiUrl('/api/admin/games'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(newGameData),

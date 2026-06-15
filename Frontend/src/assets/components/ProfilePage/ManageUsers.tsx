@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaTrash } from 'react-icons/fa';
+import { apiUrl } from '../../../config/api';
 
 // Interface που αντιστοιχεί στο UserManagementDTO του backend
 interface User {
@@ -18,7 +19,7 @@ const ManageUsers = () => {
         const fetchUsers = async () => {
             const token = localStorage.getItem('jwtToken');
             try {
-                const response = await fetch('http://localhost:8080/api/admin/users', {
+                const response = await fetch(apiUrl('/api/admin/users'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error('Failed to fetch users.');
@@ -54,7 +55,7 @@ const ManageUsers = () => {
         
         const token = localStorage.getItem('jwtToken');
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+            const response = await fetch(apiUrl(`/api/admin/users/${userId}`), {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` },
             });

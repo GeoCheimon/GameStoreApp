@@ -7,6 +7,7 @@ import { useSearchParams } from 'react-router-dom'; // CHANGE: Import useSearchP
 import placeholderImage from '../../images/placeholder.svg';
 import { FaHeart } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { apiUrl } from '../../../config/api';
 
 // ADD: Ορίζουμε τον τύπο για τα δεδομένα του παιχνιδιού
 interface Game {
@@ -69,12 +70,12 @@ const GamesPage = () => {
     // Η νέα γραμμή μπορεί να κάνει το URL άκυρο και να προκαλέσει σφάλμα στο fetch.
 
     // 2. Add the 'name' parameter to the API URL
-    const apiUrl = `http://localhost:8080/api/games?category=${category || ''}&maxPrice=${maxPrice || ''}&free=${free || ''}&discounted=${discounted || ''}&name=${name || ''}`;
+    const url = apiUrl(`/api/games?category=${category || ''}&maxPrice=${maxPrice || ''}&free=${free || ''}&discounted=${discounted || ''}&name=${name || ''}`);
     /*για να έχεις πιο λεπτομερή πληροφορία στη σελίδα GamesPage 
     για το ποια κατηγορία έχει επιλεχθεί */
     setLoading(true); // Ξεκινάμε το loading
 
-    fetch(apiUrl)
+    fetch(url)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -106,7 +107,7 @@ const GamesPage = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:8080/api/wishlist', {
+        const response = await fetch(apiUrl('/api/wishlist'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -133,8 +134,8 @@ const GamesPage = () => {
       try {
         // Παράλληλες κλήσεις για καλύτερη απόδοση
         const [wishlistRes, libraryRes] = await Promise.all([
-          fetch('http://localhost:8080/api/wishlist', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:8080/api/library', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch(apiUrl('/api/wishlist'), { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch(apiUrl('/api/library'), { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
 
         if (wishlistRes.ok) {
@@ -242,7 +243,7 @@ const GamesPage = () => {
     const method = isWishlisted ? 'DELETE' : 'POST';
 
     try {
-      const response = await fetch(`http://localhost:8080/api/wishlist/${game.id}`, {
+      const response = await fetch(apiUrl(`/api/wishlist/${game.id}`), {
         method: method,
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -284,7 +285,7 @@ const GamesPage = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/cart/${gameId}`, {
+      const response = await fetch(apiUrl(`/api/cart/${gameId}`), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
       });

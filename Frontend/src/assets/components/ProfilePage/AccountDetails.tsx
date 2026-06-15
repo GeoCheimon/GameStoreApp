@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 //import { useAuth } from '../context/AuthContext'; // Θα το χρειαστούμε για το token
+import { apiUrl } from '../../../config/api';
 
 // Ορίζουμε το "σχήμα" των δεδομένων του χρήστη που περιμένουμε από το API
 interface UserProfile {
@@ -34,7 +35,7 @@ const AccountDetails = () => {
         }
 
         // Κάνουμε την κλήση στο νέο μας endpoint
-        fetch('http://localhost:8080/api/users/me', {
+        fetch(apiUrl('/api/users/me'), {
             method: 'GET',
             headers: {
                 // Αυτό είναι το πιο κρίσιμο σημείο!
@@ -73,7 +74,7 @@ const AccountDetails = () => {
 
         const token = localStorage.getItem('jwtToken');
         try {
-            const response = await fetch('http://localhost:8080/api/users/change-password', {
+            const response = await fetch(apiUrl('/api/users/change-password'), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),

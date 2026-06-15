@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../../../config/api';
 
 interface CartItem {
     id: number;
@@ -23,7 +24,7 @@ const Cart = () => {
                 return;
             }
             try {
-                const response = await fetch('http://localhost:8080/api/cart', {
+                const response = await fetch(apiUrl('/api/cart'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error('Failed to fetch cart.');
@@ -46,7 +47,7 @@ const Cart = () => {
         if (!token) return;
 
         try {
-            const response = await fetch(`http://localhost:8080/api/cart/${gameId}`, {
+            const response = await fetch(apiUrl(`/api/cart/${gameId}`), {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
@@ -71,7 +72,7 @@ const Cart = () => {
         if (!token) return;
 
         try {
-            const response = await fetch('http://localhost:8080/api/cart/checkout', {
+            const response = await fetch(apiUrl('/api/cart/checkout'), {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

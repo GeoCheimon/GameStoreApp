@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl } from '../../../config/api';
 
 // Ορίζουμε το interface για τα δεδομένα που περιμένουμε
 interface WishlistItem {
@@ -24,7 +25,7 @@ const Wishlist = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:8080/api/wishlist', {
+                const response = await fetch(apiUrl('/api/wishlist'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -50,7 +51,7 @@ const Wishlist = () => {
         // Δεν χρειάζεται έλεγχος για token εδώ, αφού η σελίδα δεν θα φόρτωνε καν αν δεν υπήρχε.
 
         try {
-            const response = await fetch(`http://localhost:8080/api/wishlist/${gameId}`, {
+            const response = await fetch(apiUrl(`/api/wishlist/${gameId}`), {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
@@ -77,7 +78,7 @@ const Wishlist = () => {
 
         try {
             // Αλλάζουμε το URL για να καλέσουμε το νέο, ειδικό endpoint
-            const response = await fetch(`http://localhost:8080/api/cart/from-wishlist/${gameId}`, {
+            const response = await fetch(apiUrl(`/api/cart/from-wishlist/${gameId}`), {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
             });

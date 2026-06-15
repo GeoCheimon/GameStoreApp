@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css'; // Χρησιμοποιούμε το ίδιο, κοινό CSS με τη σελίδα εγγραφής
+import { apiUrl } from '../../../config/api';
 
 const LoginPage = () => {
     // State για τα πεδία της φόρμας
@@ -19,7 +20,7 @@ const LoginPage = () => {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:8080/api/authentication/login', {
+            const response = await fetch(apiUrl('/api/authentication/login'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
