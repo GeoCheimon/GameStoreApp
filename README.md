@@ -6,11 +6,11 @@ The project evolved from a simple game catalogue into a complete e-commerce-styl
 
 ## Features
 
-Game Catalogue: Browse hundreds of game titles with detailed information, including price, category, and release date.
-Search & Filters: Quickly find games by title, genre (RPG, Action, etc.), and platform.
-Shopping Cart: Add, remove, and manage products before checkout.
-User System: User registration and login with secure data storage.
-Admin Panel: Administrators can add new titles, edit prices, and delete games.
+- Game Catalogue: Browse hundreds of game titles with detailed information, including price, category, and release date.
+- Search & Filters: Quickly find games by title, genre (RPG, Action, etc.), and platform.
+- Shopping Cart: Add, remove, and manage products before checkout.
+- User System: User registration and login with secure data storage.
+- Admin Panel: Administrators can add new titles, edit prices, and delete games.
 
 ### Game Choosing
 
