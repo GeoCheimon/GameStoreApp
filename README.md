@@ -12,7 +12,7 @@ The project evolved from a simple game catalogue into a complete e-commerce-styl
 - User System: User registration and login with secure data storage.
 - Admin Panel: Administrators can add new titles, edit prices, and delete games.
 
-### Game Choosing
+### Game Browsing
 
 - Browse the game catalogue using a responsive card-based interface.
 - Filter games by category and maximum price.
