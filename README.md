@@ -58,7 +58,7 @@ The application supports:
 - View all owned games in a personal library.
 - View an ordered transaction/purchase history.
 
-### 👤 User Profile
+### User Profile
 
 The profile area uses nested React Router routes and provides separate sections for:
 
@@ -115,46 +115,6 @@ The frontend is implemented as a Single-Page Application with nested routing for
 - **Lombok**
 
 The backend uses Spring Boot's layered application structure and includes dedicated controllers, services, repositories, DTOs, models, configuration, and security packages.
-
-## Project Structure
-
-```text
-GameStoreApp/
-│
-├── Backend/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/gamestore/backend/
-│   │   │   │   ├── config/
-│   │   │   │   ├── controller/
-│   │   │   │   ├── dto/
-│   │   │   │   ├── model/
-│   │   │   │   ├── repository/
-│   │   │   │   ├── security/
-│   │   │   │   └── service/
-│   │   │   └── resources/
-│   │   │       ├── schema.sql
-│   │   │       └── data.sql
-│   │   └── test/
-│   ├── pom.xml
-│   ├── mvnw
-│   └── mvnw.cmd
-│
-├── Frontend/
-│   ├── src/
-│   │   ├── assets/components/
-│   │   ├── config/
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── public/
-│   ├── .env.example
-│   ├── package.json
-│   └── vite.config.ts
-│
-└── README.md
-```
-
-The repository currently keeps the frontend and backend as separate applications under `Frontend/` and `Backend/`.
 
 ## REST APIs
 
